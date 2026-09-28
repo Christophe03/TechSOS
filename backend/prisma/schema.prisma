@@ -1,0 +1,146 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String?       @unique
+  phone        String        @unique
+  passwordHash String
+  fullName     String
+  role         String        @default("CLIENT") // CLIENT, PROVIDER, ADMIN
+  city         String        @default("Bamako")
+  address      String?
+  avatarUrl    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  providerProfile ProviderProfile?
+  repairRequests  RepairRequest[]
+  reviewsGiven    Review[]
+}
+
+model ProviderProfile {
+  id                 String             @id @default(uuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workshopName       String
+  addressZone        String             // Ex: Hamdallaye ACI 2000, Badalabougou, Lafiabougou
+  bio                String?
+  isVerified         Boolean            @default(false)
+  ratingAvg          Float              @default(5.0)
+  reviewCount        Int                @default(0)
+  subscriptionStatus String             @default("FREE_TRIAL") // FREE_TRIAL, ACTIVE, EXPIRED
+  specialtiesJson    String             @default("[]") // Liste des ID de catégories/pannes prises en charge
+
+  offers             Offer[]
+  reviewsReceived    Review[]
+  workshopEntries    WorkshopEntry[]
+  subscriptions      Subscription[]
+}
+
+model DeviceCategory {
+  id             String          @id @default(uuid())
+  name           String          @unique // Ex: Téléphone / Smartphone, Ordinateur, Imprimante
+  iconName       String          @default("devices")
+  sortOrder      Int             @default(0)
+  createdAt      DateTime        @default(now())
+
+  issueTypes     IssueType[]
+  repairRequests RepairRequest[]
+}
+
+model IssueType {
+  id             String          @id @default(uuid())
+  categoryId     String
+  category       DeviceCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name           String          // Ex: Écran cassé, Batterie déchargée rapidement, Connecteur de charge
+  isOfficial     Boolean         @default(true) // false si soumis par un utilisateur en saisie libre
+  createdAt      DateTime        @default(now())
+
+  repairRequests RepairRequest[]
+}
+
+model RepairRequest {
+  id                   String        @id @default(uuid())
+  clientId             String
+  client               User          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  categoryId           String
+  category             DeviceCategory@relation(fields: [categoryId], references: [id])
+  issueTypeId          String?
+  issueType            IssueType?    @relation(fields: [issueTypeId], references: [id])
+  customIssueTitle     String?       // Utilisé si l'utilisateur a choisi "Autre"
+  descriptionText      String
+  voiceAudioUrl        String?       // URL de la note vocale enregistrée
+  photoUrlsJson        String        @default("[]") // Tableau JSON des URLs de photos
+  status               String        @default("PENDING") // PENDING, OFFERS_RECEIVED, IN_PROGRESS, COMPLETED, CANCELLED
+  locationAddress      String?
+  selectedOfferId      String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  offers               Offer[]
+  review               Review?
+}
+
+model Offer {
+  id                String        @id @default(uuid())
+  repairRequestId   String
+  repairRequest     RepairRequest @relation(fields: [repairRequestId], references: [id], onDelete: Cascade)
+  providerId        String
+  provider          ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  priceCfa          Int           // Prix proposé en FCFA
+  estimatedDuration String        // Ex: "2 heures", "24h", "2 jours"
+  comment           String?
+  status            String        @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt         DateTime      @default(now())
+}
+
+model Review {
+  id              String          @id @default(uuid())
+  repairRequestId String          @unique
+  repairRequest   RepairRequest   @relation(fields: [repairRequestId], references: [id], onDelete: Cascade)
+  clientId        String
+  client          User            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  providerId      String
+  provider        ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  rating          Int             // 1 à 5
+  comment         String?
+  createdAt       DateTime        @default(now())
+}
+
+model WorkshopEntry {
+  id                     String         @id @default(uuid())
+  providerId             String
+  provider               ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  origin                 String         @default("FROM_APP") // FROM_APP, WALK_IN_OFFLINE
+  clientName             String
+  clientPhone            String
+  deviceModel            String
+  issueSummary           String
+  voiceNoteUrl           String?
+  status                 String         @default("DEPOSITED") // DEPOSITED, DIAGNOSTIC, IN_REPAIR, READY_FOR_PICKUP, DELIVERED
+  priceCfa               Int?
+  whatsappNotifiedAt     DateTime?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+}
+
+model Subscription {
+  id              String             @id @default(uuid())
+  providerId      String
+  provider        ProviderProfile    @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  planName        String             @default("Standard Pro")
+  amountCfa       Int                @default(5000)
+  startDate       DateTime           @default(now())
+  endDate         DateTime
+  status          String             @default("ACTIVE") // ACTIVE, EXPIRED
+  paymentMethod   String             // ORANGE_MONEY ou MOOV_MONEY
+  transactionRef  String             @unique
+  createdAt       DateTime           @default(now())
+}
