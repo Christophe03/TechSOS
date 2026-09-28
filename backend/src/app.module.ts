@@ -8,6 +8,9 @@ import { StorageModule } from './modules/storage/storage.module';
 import { RepairsModule } from './modules/repairs/repairs.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { WorkshopModule } from './modules/workshop/workshop.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -22,6 +25,9 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     RepairsModule,
     OffersModule,
     ReviewsModule,
+    NotificationsModule,
+    WorkshopModule,
+    SubscriptionsModule,
   ],
 })
 export class AppModule {}
