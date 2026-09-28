@@ -1,47 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/styles.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/star_rating.dart';
 import 'core/widgets/status_badge.dart';
 import 'core/widgets/techsos_button.dart';
+import 'features/auth/providers/auth_provider.dart';
+import 'features/auth/screens/role_selection_screen.dart';
 
 /// Root application widget for TechSOS
-class TechSosApp extends StatelessWidget {
+class TechSosApp extends ConsumerWidget {
   const TechSosApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
     return MaterialApp(
       title: 'TechSOS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const TechSosHomeScreen(),
+      home: authState.isAuthenticated
+          ? const TechSosHomeScreen()
+          : const RoleSelectionScreen(),
     );
   }
 }
 
 /// Initial Home Screen showing design system components
-class TechSosHomeScreen extends StatelessWidget {
+class TechSosHomeScreen extends ConsumerWidget {
   const TechSosHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('TechSOS'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Se déconnecter',
+            onPressed: () {
+              ref.read(authProvider.notifier).logout();
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Bienvenue sur TechSOS',
+            Text(
+              user != null
+                  ? 'Bonjour, ${user.fullName} !'
+                  : 'Bienvenue sur TechSOS',
               style: TechSosStyles.headingLarge,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Dépannage d\'appareils électroniques à Bamako',
+            Text(
+              user != null && user.isProvider
+                  ? 'Atelier : ${user.workshopName ?? "Non renseigné"} (${user.addressZone ?? user.city})'
+                  : 'Dépannage d\'appareils électroniques à Bamako',
               style: TechSosStyles.bodySecondary,
             ),
             const SizedBox(height: 24),
