@@ -24,6 +24,10 @@ class ApiEndpoints {
   static const String repairs = '/repairs';
   static const String myRepairs = '/repairs/my-requests';
   static const String providerFeed = '/repairs/feed';
+  static String repairDetail(String id) => '/repairs/$id';
+  static String repairOffers(String repairId) => '/repairs/$repairId/offers';
+  static String acceptOffer(String offerId) => '/offers/$offerId/accept';
+  static String repairReviews(String repairId) => '/repairs/$repairId/reviews';
 
   // Gestion Atelier, Abonnements & Médias
   static const String workshop = '/workshop';
