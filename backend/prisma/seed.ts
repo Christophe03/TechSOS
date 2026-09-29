@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -117,7 +118,87 @@ export async function seed() {
     }
   }
 
-  console.log('✨ Seed des catégories et pannes de Bamako terminé avec succès !');
+  // --- Seed des comptes de démonstration (Golden Innovation Tech) ---
+  const passwordHash = await bcrypt.hash('password123', 10);
+  const adminPasswordHash = await bcrypt.hash('adminpassword123', 10);
+
+  // 1. Client Démo
+  const demoClient = await prisma.user.upsert({
+    where: { phone: '+22370000001' },
+    update: {},
+    create: {
+      phone: '+22370000001',
+      fullName: 'Amadou Diallo',
+      passwordHash,
+      role: 'CLIENT',
+      city: 'Bamako',
+      address: 'Badalabougou, Bamako',
+    },
+  });
+  console.log(`✓ Client Démo synchronisé: ${demoClient.fullName} (${demoClient.phone})`);
+
+  // 2. Réparateur Démo
+  const phoneCat = await prisma.deviceCategory.findUnique({
+    where: { name: 'Téléphone / Smartphone' },
+  });
+  const laptopCat = await prisma.deviceCategory.findUnique({
+    where: { name: 'Ordinateur portable / Fixe' },
+  });
+  const demoSpecialties = JSON.stringify([phoneCat?.id, laptopCat?.id].filter(Boolean));
+
+  const demoProviderUser = await prisma.user.upsert({
+    where: { phone: '+22376000001' },
+    update: {},
+    create: {
+      phone: '+22376000001',
+      fullName: 'Mamadou Koné',
+      passwordHash,
+      role: 'PROVIDER',
+      city: 'Bamako',
+      address: 'Hamdallaye ACI 2000, Bamako',
+    },
+  });
+
+  await prisma.providerProfile.upsert({
+    where: { userId: demoProviderUser.id },
+    update: {
+      workshopName: 'Clinique High-Tech Bamako',
+      addressZone: 'Hamdallaye ACI 2000',
+      subscriptionStatus: 'ACTIVE',
+      specialtiesJson: demoSpecialties,
+      ratingAvg: 4.9,
+      reviewCount: 12,
+    },
+    create: {
+      userId: demoProviderUser.id,
+      workshopName: 'Clinique High-Tech Bamako',
+      addressZone: 'Hamdallaye ACI 2000',
+      bio: 'Spécialiste micro-soudure et réparations express smartphones & ordinateurs',
+      isVerified: true,
+      subscriptionStatus: 'ACTIVE',
+      specialtiesJson: demoSpecialties,
+      ratingAvg: 4.9,
+      reviewCount: 12,
+    },
+  });
+  console.log(`✓ Réparateur Démo synchronisé: Mamadou Koné (+22376000001)`);
+
+  // 3. Administrateur Démo
+  const demoAdmin = await prisma.user.upsert({
+    where: { phone: '+22370000000' },
+    update: {},
+    create: {
+      phone: '+22370000000',
+      fullName: 'Administrateur TechSOS',
+      passwordHash: adminPasswordHash,
+      role: 'ADMIN',
+      city: 'Bamako',
+      address: 'Siège Golden Innovation Tech, Bamako',
+    },
+  });
+  console.log(`✓ Admin Démo synchronisé: ${demoAdmin.fullName} (${demoAdmin.phone})`);
+
+  console.log('✨ Seed des catégories, pannes et comptes démo de Bamako terminé avec succès !');
 }
 
 if (require.main === module) {
