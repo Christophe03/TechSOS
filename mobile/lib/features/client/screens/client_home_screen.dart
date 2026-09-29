@@ -4,6 +4,7 @@ import '../../../core/constants/colors.dart';
 import '../../../core/constants/styles.dart';
 import '../../../core/widgets/star_rating.dart';
 import '../../../core/widgets/techsos_button.dart';
+import '../../../core/widgets/techsos_logo.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/provider_card_model.dart';
 import '../providers/client_repairs_provider.dart';
@@ -161,31 +162,8 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     return Scaffold(
       backgroundColor: TechSosColors.background,
       appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: TechSosColors.accent.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.build_rounded,
-                color: TechSosColors.accent,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'TechSOS Bamako',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: TechSosColors.primary,
-              ),
-            ),
-          ],
-        ),
+        title: const TechSosLogoHorizontal(height: 38),
+        titleSpacing: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded),

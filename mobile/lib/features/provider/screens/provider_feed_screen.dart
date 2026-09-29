@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/styles.dart';
 import '../../../core/widgets/techsos_button.dart';
+import '../../../core/widgets/techsos_logo.dart';
 import '../../client/models/repair_model.dart';
 import '../providers/provider_workshop_provider.dart';
 import 'submit_offer_dialog.dart';
@@ -42,7 +43,8 @@ class _ProviderFeedScreenState extends ConsumerState<ProviderFeedScreen> {
     return Scaffold(
       backgroundColor: TechSosColors.background,
       appBar: AppBar(
-        title: const Text('Fil des pannes à Bamako'),
+        title: const TechSosLogoHorizontal(height: 38),
+        titleSpacing: 0,
         elevation: 0,
       ),
       body: Center(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/styles.dart';
+import '../../../core/widgets/techsos_logo.dart';
 import 'login_screen.dart';
 import 'register_client_screen.dart';
 import 'register_provider_screen.dart';
@@ -23,42 +24,13 @@ class RoleSelectionScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 16),
-                  // Logo / Marque TechSOS
-                  Center(
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        color: TechSosColors.primary,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: TechSosColors.primary.withValues(alpha: 0.25),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.build_circle_rounded,
-                        color: Colors.white,
-                        size: 42,
-                      ),
-                    ),
+                  // Logo officiel TechSOS — bouclier + éclair vectoriel
+                  const Center(
+                    child: TechSosLogo(size: 96, withText: true),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
 
-                  // Titre et sous-titre
-                  const Text(
-                    'Bienvenue sur TechSOS',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: TechSosColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                  // Sous-titre
                   const Text(
                     'La solution d\'urgence pour vos appareils en panne à Bamako',
                     textAlign: TextAlign.center,
