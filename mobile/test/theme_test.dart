@@ -4,33 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_sos/core/constants/colors.dart';
 import 'package:tech_sos/core/theme/app_theme.dart';
-import 'package:tech_sos/features/auth/models/user_model.dart';
-import 'package:tech_sos/features/auth/providers/auth_provider.dart';
 import 'package:tech_sos/features/settings/providers/settings_provider.dart';
 import 'package:tech_sos/features/settings/screens/settings_screen.dart';
-
-class _FakeAuthNotifier extends StateNotifier<AuthState> implements AuthNotifier {
-  _FakeAuthNotifier()
-      : super(const AuthState(
-          isAuthenticated: true,
-          user: UserModel(
-            id: 'user-client-1',
-            phone: '+22370000001',
-            fullName: 'Mamadou Diarra',
-            role: 'CLIENT',
-            city: 'Bamako',
-          ),
-          isLoading: false,
-        ));
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-
-  @override
-  Future<void> logout() async {
-    state = AuthState.unauthenticated();
-  }
-}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

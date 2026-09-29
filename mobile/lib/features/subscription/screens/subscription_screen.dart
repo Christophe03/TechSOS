@@ -207,14 +207,17 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Standard Pro',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              const Expanded(
+                child: Text(
+                  'Standard Pro',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               // Badge statut
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -253,12 +256,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
             children: [
               const Icon(Icons.timer_outlined, color: Colors.white70, size: 16),
               const SizedBox(width: 6),
-              Text(
-                expiryText,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: Text(
+                  expiryText,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -485,6 +492,10 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     Color brandColor,
   ) {
     final isSelected = _selectedPaymentMethod == key;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final unselectedBg = isDark ? TechSosColors.cardBackgroundDark : Colors.white;
+    final unselectedBorder = isDark ? TechSosColors.borderDark : TechSosColors.border;
+    final unselectedText = isDark ? TechSosColors.textPrimaryDark : TechSosColors.textPrimary;
 
     return InkWell(
       onTap: () {
@@ -494,26 +505,30 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: isSelected ? brandColor.withValues(alpha: 0.1) : Colors.white,
+          color: isSelected ? brandColor.withValues(alpha: isDark ? 0.2 : 0.1) : unselectedBg,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? brandColor : TechSosColors.border,
+            color: isSelected ? brandColor : unselectedBorder,
             width: isSelected ? 2.0 : 1.0,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected ? brandColor : TechSosColors.textPrimary,
+            Text(emoji, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  color: isSelected ? brandColor : unselectedText,
+                ),
               ),
             ),
           ],
