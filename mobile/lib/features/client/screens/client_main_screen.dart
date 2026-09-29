@@ -210,28 +210,67 @@ class _ClientProfileTab extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                  ListTile(
-                    leading: const Icon(Icons.history_rounded, color: TechSosColors.primary),
-                    title: const Text('Mes demandes de dépannage', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: onViewRequestsTap,
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.add_alert_rounded, color: TechSosColors.accent),
-                    title: const Text('Lancer un nouveau SOS', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: onNewRequestTap,
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.help_outline_rounded, color: TechSosColors.primary),
-                    title: const Text('Aide & Support Bamako', style: TextStyle(fontSize: 14)),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () {},
-                  ),
-                ],
-              ),
+                    InkWell(
+                      onTap: onViewRequestsTap,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.history_rounded, color: TechSosColors.primary, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Mes demandes de dépannage',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    InkWell(
+                      onTap: onNewRequestTap,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.add_alert_rounded, color: TechSosColors.accent, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Lancer un nouveau SOS',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    InkWell(
+                      onTap: () {},
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.help_outline_rounded, color: TechSosColors.primary, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Aide & Support Bamako',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
             ),
           ),
             const SizedBox(height: 24),

@@ -348,35 +348,7 @@ class _WorkshopTicketCard extends ConsumerWidget {
                 ...statuses.map((s) {
                   final isCurrent = entry.status == s['key'];
                   final isReady = s['key'] == 'READY_FOR_PICKUP';
-                  return ListTile(
-                    leading: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: s['color'] as Color,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    title: Text(
-                      s['label'] as String,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
-                      ),
-                    ),
-                    subtitle: isReady
-                        ? const Text(
-                            '📱 Notifiera automatiquement le client sur WhatsApp',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF2E8B57),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        : null,
-                    trailing: isCurrent
-                        ? const Icon(Icons.check, color: TechSosColors.primary)
-                        : null,
+                  return InkWell(
                     onTap: () async {
                       Navigator.of(ctx).pop();
                       try {
@@ -403,12 +375,56 @@ class _WorkshopTicketCard extends ConsumerWidget {
                                 'Erreur : $e',
                                 style: const TextStyle(fontSize: 14),
                               ),
-                              backgroundColor: Colors.redAccent,
+                              backgroundColor: Colors.red,
                             ),
                           );
                         }
                       }
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: s['color'] as Color,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  s['label'] as String,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
+                                    color: TechSosColors.textPrimary,
+                                  ),
+                                ),
+                                if (isReady) ...[
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    '📱 Notifiera automatiquement le client sur WhatsApp',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF2E8B57),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          if (isCurrent)
+                            const Icon(Icons.check_rounded, color: TechSosColors.primary),
+                        ],
+                      ),
+                    ),
                   );
                 }),
               ],

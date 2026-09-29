@@ -242,34 +242,64 @@ class _ProviderProfileTab extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    ListTile(
-                      leading: const Icon(Icons.handyman_rounded, color: TechSosColors.primary),
-                      title: const Text(
-                        'Gestion du Journal d\'Atelier',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                    InkWell(
                       onTap: onViewWorkshop,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.handyman_rounded, color: TechSosColors.primary, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Gestion du Journal d\'Atelier',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
                     ),
                     const Divider(height: 1),
-                    ListTile(
-                      leading: const Icon(Icons.local_offer_rounded, color: TechSosColors.accent),
-                      title: const Text(
-                        'Mes devis et offres envoyés',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                    InkWell(
                       onTap: onViewOffers,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.local_offer_rounded, color: TechSosColors.accent, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Mes devis et offres envoyés',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
                     ),
                     const Divider(height: 1),
-                    ListTile(
-                      leading: const Icon(Icons.card_membership_rounded, color: Color(0xFF2E8B57)),
-                      title: const Text(
-                        'Gérer mon abonnement (5 000 FCFA)',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                    InkWell(
                       onTap: onViewSubscription,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.card_membership_rounded, color: Color(0xFF2E8B57), size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Gérer mon abonnement (5 000 FCFA)',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
