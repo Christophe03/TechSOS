@@ -45,8 +45,11 @@ class _ProviderFeedScreenState extends ConsumerState<ProviderFeedScreen> {
         title: const Text('Fil des pannes à Bamako'),
         elevation: 0,
       ),
-      body: Column(
-        children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            children: [
           // Barre de recherche et filtres de catégorie
           Container(
             color: Colors.white,
@@ -240,7 +243,9 @@ class _ProviderFeedScreenState extends ConsumerState<ProviderFeedScreen> {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }
 
@@ -274,35 +279,49 @@ class _ProviderFeedCard extends StatelessWidget {
             // Ligne du haut : Tag catégorie & Localisation
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: TechSosColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    repair.categoryName ?? 'Électronique',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: TechSosColors.primary,
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: TechSosColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      repair.categoryName ?? 'Électronique',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: TechSosColors.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
-                const Spacer(),
-                const Icon(
-                  Icons.location_on_outlined,
-                  size: 16,
-                  color: TechSosColors.accent,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  repair.locationAddress ?? 'Bamako',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: TechSosColors.textSecondary,
-                  ),
+                const SizedBox(width: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 16,
+                      color: TechSosColors.accent,
+                    ),
+                    const SizedBox(width: 4),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 140),
+                      child: Text(
+                        repair.locationAddress ?? 'Bamako',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: TechSosColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -345,15 +364,18 @@ class _ProviderFeedCard extends StatelessWidget {
                   children: [
                     Icon(Icons.mic, color: TechSosColors.primary, size: 20),
                     SizedBox(width: 8),
-                    Text(
-                      'Message vocal du client inclus',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: TechSosColors.primary,
+                    Expanded(
+                      child: Text(
+                        'Message vocal du client inclus',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: TechSosColors.primary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Spacer(),
+                    SizedBox(width: 8),
                     Icon(Icons.play_circle_fill_rounded, color: TechSosColors.primary, size: 24),
                   ],
                 ),
