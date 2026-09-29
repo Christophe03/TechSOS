@@ -199,6 +199,134 @@ export async function seed() {
   });
   console.log(`✓ Admin Démo synchronisé: ${demoAdmin.fullName} (${demoAdmin.phone})`);
 
+  // 4. Données de démonstration : Pannes SOS et Devis / Offres pour Bamako
+  const screenIssue = await prisma.issueType.findFirst({
+    where: { name: 'Écran fissuré / cassé', categoryId: phoneCat?.id },
+  });
+  const overheatIssue = await prisma.issueType.findFirst({
+    where: { name: 'Surchauffe / Nettoyage ventilateur', categoryId: laptopCat?.id },
+  });
+  const chargeIssue = await prisma.issueType.findFirst({
+    where: { name: 'Connecteur de charge défaillant', categoryId: phoneCat?.id },
+  });
+  const providerProfile = await prisma.providerProfile.findUnique({
+    where: { userId: demoProviderUser.id },
+  });
+
+  if (providerProfile && screenIssue && overheatIssue && chargeIssue) {
+    // Demande 1 : iPhone 11 - Offre en attente
+    const repair1 = await prisma.repairRequest.upsert({
+      where: { id: 'demo-repair-iphone-11' },
+      update: {},
+      create: {
+        id: 'demo-repair-iphone-11',
+        clientId: demoClient.id,
+        categoryId: phoneCat!.id,
+        issueTypeId: screenIssue.id,
+        customIssueTitle: 'iPhone 11 - Écran fissuré après chute',
+        descriptionText: 'Vitre brisée mais le tactile fonctionne encore. Besoin d un remplacement rapide avant demain midi.',
+        locationAddress: 'Badalabougou, Rue 14',
+        status: 'PENDING',
+      },
+    });
+
+    await prisma.offer.upsert({
+      where: { id: 'demo-offer-screen-15000' },
+      update: {},
+      create: {
+        id: 'demo-offer-screen-15000',
+        repairRequestId: repair1.id,
+        providerId: providerProfile.id,
+        priceCfa: 15000,
+        estimatedDuration: '2h',
+        comment: 'Écran original disponible en stock à notre atelier ACI 2000. Réparation garantie 3 mois.',
+        status: 'PENDING',
+      },
+    });
+
+    // Demande 2 : HP Pavilion 15 - Offre acceptée par le client
+    const repair2 = await prisma.repairRequest.upsert({
+      where: { id: 'demo-repair-hp-pavilion' },
+      update: {},
+      create: {
+        id: 'demo-repair-hp-pavilion',
+        clientId: demoClient.id,
+        categoryId: laptopCat!.id,
+        issueTypeId: overheatIssue.id,
+        customIssueTitle: 'HP Pavilion 15 - Surchauffe et arrêt inopiné',
+        descriptionText: 'Le ventilateur fait un bruit très fort et le PC coupe brutalement après 15 minutes d utilisation.',
+        locationAddress: 'Hamdallaye ACI 2000',
+        status: 'IN_PROGRESS',
+        selectedOfferId: 'demo-offer-hp-25000',
+      },
+    });
+
+    await prisma.offer.upsert({
+      where: { id: 'demo-offer-hp-25000' },
+      update: {},
+      create: {
+        id: 'demo-offer-hp-25000',
+        repairRequestId: repair2.id,
+        providerId: providerProfile.id,
+        priceCfa: 25000,
+        estimatedDuration: '24h',
+        comment: 'Démontage intégral, dépoussiérage compresseur et remplacement pâte thermique haute conductivité.',
+        status: 'ACCEPTED',
+      },
+    });
+
+    // Demande 3 : Samsung A52 - En attente dans le fil des pannes
+    await prisma.repairRequest.upsert({
+      where: { id: 'demo-repair-samsung-a52' },
+      update: {},
+      create: {
+        id: 'demo-repair-samsung-a52',
+        clientId: demoClient.id,
+        categoryId: phoneCat!.id,
+        issueTypeId: chargeIssue.id,
+        customIssueTitle: 'Samsung Galaxy A52 - Ne charge plus',
+        descriptionText: 'Le câble doit être tordu pour charger. Problème au niveau du connecteur USB-C.',
+        locationAddress: 'Lafiabougou, près du marché',
+        status: 'PENDING',
+      },
+    });
+
+    // 5. Journal d atelier (Back-Office)
+    await prisma.workshopEntry.upsert({
+      where: { id: 'demo-workshop-macbook' },
+      update: {},
+      create: {
+        id: 'demo-workshop-macbook',
+        providerId: providerProfile.id,
+        origin: 'WALK_IN_OFFLINE',
+        clientName: 'Ousmane Traoré',
+        clientPhone: '+22372000001',
+        deviceModel: 'Apple MacBook Pro M1 2020',
+        issueSummary: 'Clavier bloqué suite projection de thé, diagnostic carte mère requis',
+        priceCfa: 45000,
+        status: 'IN_REPAIR',
+      },
+    });
+
+    await prisma.workshopEntry.upsert({
+      where: { id: 'demo-workshop-tecno' },
+      update: {},
+      create: {
+        id: 'demo-workshop-tecno',
+        providerId: providerProfile.id,
+        origin: 'WALK_IN_OFFLINE',
+        clientName: 'Awa Sangaré',
+        clientPhone: '+22378000002',
+        deviceModel: 'Tecno Camon 20 Premier',
+        issueSummary: 'Changement vitre arrière et test micro',
+        priceCfa: 12000,
+        status: 'READY_FOR_PICKUP',
+      },
+    });
+
+    console.log('✓ Données démo synchronisées (Offres, Pannes SOS & Journal d atelier)');
+  }
+
   console.log('✨ Seed des catégories, pannes et comptes démo de Bamako terminé avec succès !');
 }
 

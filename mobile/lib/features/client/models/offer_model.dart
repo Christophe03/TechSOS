@@ -12,6 +12,12 @@ class OfferModel {
   final String? comment;
   final String status;
   final DateTime createdAt;
+  final String? repairTitle;
+  final String? categoryName;
+  final String? issueTypeName;
+  final String? clientName;
+  final String? clientPhone;
+  final String? clientCity;
 
   const OfferModel({
     required this.id,
@@ -26,6 +32,12 @@ class OfferModel {
     this.comment,
     this.status = 'PENDING',
     required this.createdAt,
+    this.repairTitle,
+    this.categoryName,
+    this.issueTypeName,
+    this.clientName,
+    this.clientPhone,
+    this.clientCity,
   });
 
   bool get isPending => status.toUpperCase() == 'PENDING';
@@ -36,6 +48,14 @@ class OfferModel {
   factory OfferModel.fromJson(Map<String, dynamic> json) {
     final provider = json['provider'] as Map<String, dynamic>?;
     final user = provider?['user'] as Map<String, dynamic>?;
+    final repair = json['repairRequest'] as Map<String, dynamic>?;
+    final category = repair?['category'] as Map<String, dynamic>?;
+    final issueType = repair?['issueType'] as Map<String, dynamic>?;
+    final client = repair?['client'] as Map<String, dynamic>?;
+
+    final resolvedTitle = repair?['customIssueTitle']?.toString() ??
+        repair?['title']?.toString() ??
+        issueType?['name']?.toString();
 
     double parseRating(dynamic val) {
       if (val == null) return 0.0;
@@ -71,6 +91,12 @@ class OfferModel {
       comment: json['comment']?.toString(),
       status: json['status']?.toString() ?? 'PENDING',
       createdAt: parseDate(json['createdAt']),
+      repairTitle: resolvedTitle,
+      categoryName: category?['name']?.toString(),
+      issueTypeName: issueType?['name']?.toString(),
+      clientName: client?['fullName']?.toString(),
+      clientPhone: client?['phone']?.toString(),
+      clientCity: client?['city']?.toString(),
     );
   }
 
