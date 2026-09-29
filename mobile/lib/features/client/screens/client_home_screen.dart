@@ -162,7 +162,11 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     return Scaffold(
       backgroundColor: TechSosColors.background,
       appBar: AppBar(
-        title: const TechSosLogoHorizontal(height: 38),
+        title: const TechSosLogoHorizontal(
+          height: 38,
+          variant: TechSosLogoVariant.white,
+          showSubtitle: false,
+        ),
         titleSpacing: 0,
         actions: [
           IconButton(
