@@ -6,6 +6,7 @@ class UserModel {
   final String role;
   final String? email;
   final String city;
+  final String? address;
   final String? workshopName;
   final String? addressZone;
   final String? bio;
@@ -21,6 +22,7 @@ class UserModel {
     required this.role,
     this.email,
     this.city = 'Bamako',
+    this.address,
     this.workshopName,
     this.addressZone,
     this.bio,
@@ -56,6 +58,7 @@ class UserModel {
       role: json['role'] as String? ?? 'CLIENT',
       email: json['email'] as String?,
       city: json['city'] as String? ?? 'Bamako',
+      address: json['address'] as String?,
       workshopName: (json['workshopName'] ?? profile?['workshopName']) as String?,
       addressZone: (json['addressZone'] ?? profile?['addressZone']) as String?,
       bio: (json['bio'] ?? profile?['bio']) as String?,
@@ -75,6 +78,7 @@ class UserModel {
       'role': role,
       if (email != null) 'email': email,
       'city': city,
+      if (address != null) 'address': address,
       if (workshopName != null) 'workshopName': workshopName,
       if (addressZone != null) 'addressZone': addressZone,
       if (bio != null) 'bio': bio,
@@ -92,6 +96,7 @@ class UserModel {
     String? role,
     String? email,
     String? city,
+    String? address,
     String? workshopName,
     String? addressZone,
     String? bio,
@@ -107,6 +112,7 @@ class UserModel {
       role: role ?? this.role,
       email: email ?? this.email,
       city: city ?? this.city,
+      address: address ?? this.address,
       workshopName: workshopName ?? this.workshopName,
       addressZone: addressZone ?? this.addressZone,
       bio: bio ?? this.bio,
@@ -128,6 +134,7 @@ class UserModel {
           role == other.role &&
           email == other.email &&
           city == other.city &&
+          address == other.address &&
           workshopName == other.workshopName &&
           addressZone == other.addressZone &&
           bio == other.bio &&
@@ -144,6 +151,7 @@ class UserModel {
       role.hashCode ^
       email.hashCode ^
       city.hashCode ^
+      address.hashCode ^
       workshopName.hashCode ^
       addressZone.hashCode ^
       bio.hashCode ^

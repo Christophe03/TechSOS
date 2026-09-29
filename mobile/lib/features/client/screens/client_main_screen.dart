@@ -4,6 +4,8 @@ import '../../../core/constants/colors.dart';
 import '../../../core/constants/styles.dart';
 import '../../../core/widgets/techsos_button.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../auth/widgets/edit_profile_dialog.dart';
+import '../../auth/widgets/change_password_dialog.dart';
 import 'client_home_screen.dart';
 import 'my_requests_screen.dart';
 import 'publish_repair_screen.dart';
@@ -211,6 +213,46 @@ class _ClientProfileTab extends ConsumerWidget {
                 child: Column(
                   children: [
                     InkWell(
+                      onTap: () => EditProfileDialog.show(context, isProvider: false),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined, color: TechSosColors.primary, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Modifier mes informations personnelles',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    InkWell(
+                      onTap: () => ChangePasswordDialog.show(context),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.lock_outline_rounded, color: TechSosColors.accent, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Changer mon mot de passe',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    InkWell(
                       onTap: onViewRequestsTap,
                       child: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
@@ -271,8 +313,8 @@ class _ClientProfileTab extends ConsumerWidget {
                     ),
                   ],
                 ),
+              ),
             ),
-          ),
             const SizedBox(height: 24),
 
             // Bouton déconnexion

@@ -696,4 +696,21 @@ class _MockAuthNotifier extends StateNotifier<AuthState>
     String? bio,
     List<String>? specialties,
   }) async => true;
+
+  @override
+  Future<bool> updateProfile({
+    String? fullName,
+    String? email,
+    String? city,
+    String? address,
+    String? workshopName,
+    String? addressZone,
+    String? bio,
+  }) async => true;
+
+  @override
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async => true;
 }

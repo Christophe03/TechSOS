@@ -1,7 +1,9 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -14,6 +16,26 @@ export class UsersController {
     return this.usersService.getMe(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  async updateProfile(
+    @CurrentUser() user: any,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    const userId = user.userId || user.id;
+    return this.usersService.updateProfile(userId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(
+    @CurrentUser() user: any,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    const userId = user.userId || user.id;
+    return this.usersService.changePassword(userId, dto);
+  }
+
   @Get('providers')
   async findProviders(
     @Query('specialtyId') specialtyId?: string,
@@ -22,3 +44,4 @@ export class UsersController {
     return this.usersService.findProviders({ specialtyId, zone });
   }
 }
+

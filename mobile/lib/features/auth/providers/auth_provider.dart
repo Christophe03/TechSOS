@@ -251,6 +251,90 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Mise à jour des informations de profil (client ou réparateur)
+  Future<bool> updateProfile({
+    String? fullName,
+    String? email,
+    String? city,
+    String? address,
+    String? workshopName,
+    String? addressZone,
+    String? bio,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final payload = <String, dynamic>{};
+      if (fullName != null) payload['fullName'] = fullName.trim();
+      if (email != null) payload['email'] = email.trim();
+      if (city != null) payload['city'] = city.trim();
+      if (address != null) payload['address'] = address.trim();
+      if (workshopName != null) payload['workshopName'] = workshopName.trim();
+      if (addressZone != null) payload['addressZone'] = addressZone.trim();
+      if (bio != null) payload['bio'] = bio.trim();
+
+      final response = await apiClient.patch(
+        ApiEndpoints.updateProfile,
+        data: payload,
+      );
+
+      final userData = response.data as Map<String, dynamic>;
+      final updatedUser = UserModel.fromJson(userData);
+
+      await cacheManager.saveUser(updatedUser.toJson());
+
+      state = state.copyWith(
+        isLoading: false,
+        user: updatedUser,
+        errorMessage: null,
+      );
+      return true;
+    } on ApiException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.message,
+      );
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Impossible de mettre à jour le profil.',
+      );
+      return false;
+    }
+  }
+
+  /// Modification du mot de passe
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await apiClient.patch(
+        ApiEndpoints.changePassword,
+        data: {
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        },
+      );
+
+      state = state.copyWith(isLoading: false, errorMessage: null);
+      return true;
+    } on ApiException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.message,
+      );
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Impossible de modifier le mot de passe.',
+      );
+      return false;
+    }
+  }
+
   /// Déconnexion complète
   Future<void> logout() async {
     await cacheManager.clear();

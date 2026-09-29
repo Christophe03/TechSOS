@@ -13,6 +13,7 @@ class FakeApiClient extends ApiClient {
 
   Map<String, dynamic>? nextPostResponse;
   Map<String, dynamic>? nextGetResponse;
+  Map<String, dynamic>? nextPatchResponse;
   ApiException? errorToThrow;
   String? lastPath;
   dynamic lastData;
@@ -50,6 +51,25 @@ class FakeApiClient extends ApiClient {
       requestOptions: RequestOptions(path: path),
       statusCode: 200,
       data: nextGetResponse as T?,
+    );
+  }
+
+  @override
+  Future<Response<T>> patch<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    lastPath = path;
+    lastData = data;
+    if (errorToThrow != null) {
+      throw errorToThrow!;
+    }
+    return Response<T>(
+      requestOptions: RequestOptions(path: path),
+      statusCode: 200,
+      data: nextPatchResponse as T?,
     );
   }
 }
@@ -436,6 +456,47 @@ void main() {
       expect(authNotifier.state.user, isNull);
       expect(await cacheManager.getToken(), isNull);
       expect(await cacheManager.getUser(), isNull);
+    });
+
+    test('updateProfile sends PATCH to /users/profile and updates state & cache', () async {
+      fakeApiClient.nextPatchResponse = {
+        'id': 'user-1',
+        'phone': '+22370000001',
+        'fullName': 'Amadou Nouveau Nom',
+        'role': 'CLIENT',
+        'city': 'Bamako',
+        'address': 'Badalabougou Rue 12',
+      };
+
+      final success = await authNotifier.updateProfile(
+        fullName: 'Amadou Nouveau Nom',
+        address: 'Badalabougou Rue 12',
+      );
+
+      expect(success, isTrue);
+      expect(fakeApiClient.lastPath, ApiEndpoints.updateProfile);
+      expect(authNotifier.state.user?.fullName, 'Amadou Nouveau Nom');
+      expect(authNotifier.state.user?.address, 'Badalabougou Rue 12');
+
+      final cached = await cacheManager.getUser();
+      expect(cached?['fullName'], 'Amadou Nouveau Nom');
+    });
+
+    test('changePassword sends PATCH to /users/change-password and succeeds', () async {
+      fakeApiClient.nextPatchResponse = {
+        'success': true,
+        'message': 'Mot de passe modifié avec succès',
+      };
+
+      final success = await authNotifier.changePassword(
+        currentPassword: 'oldSecretPassword',
+        newPassword: 'newSecurePassword2026',
+      );
+
+      expect(success, isTrue);
+      expect(fakeApiClient.lastPath, ApiEndpoints.changePassword);
+      expect(fakeApiClient.lastData['currentPassword'], 'oldSecretPassword');
+      expect(fakeApiClient.lastData['newPassword'], 'newSecurePassword2026');
     });
   });
 }

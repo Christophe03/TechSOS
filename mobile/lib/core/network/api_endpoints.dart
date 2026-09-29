@@ -26,6 +26,8 @@ class ApiEndpoints {
 
   // Utilisateurs & Profils
   static const String me = '/users/me';
+  static const String updateProfile = '/users/profile';
+  static const String changePassword = '/users/change-password';
   static const String providers = '/users/providers';
 
   // Catégories de pannes
