@@ -162,12 +162,20 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     return Scaffold(
       backgroundColor: TechSosColors.background,
       appBar: AppBar(
-        title: const TechSosLogoHorizontal(
-          height: 38,
-          variant: TechSosLogoVariant.white,
-          showSubtitle: false,
+        title: const Row(
+          children: [
+            TechSosLogo(size: 32, variant: TechSosLogoVariant.white),
+            SizedBox(width: 10),
+            Text(
+              'TechSOS Bamako',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
-        titleSpacing: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded),

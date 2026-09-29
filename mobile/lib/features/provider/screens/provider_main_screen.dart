@@ -8,6 +8,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../../auth/widgets/edit_profile_dialog.dart';
 import '../../auth/widgets/change_password_dialog.dart';
 import '../../subscription/screens/subscription_screen.dart';
+import '../../settings/screens/settings_screen.dart';
 import 'my_offers_screen.dart';
 import 'provider_feed_screen.dart';
 import 'workshop_journal_screen.dart';
@@ -143,6 +144,18 @@ class _ProviderProfileTab extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Profil Réparateur'),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Paramètres',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -335,6 +348,31 @@ class _ProviderProfileTab extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 'Gérer mon abonnement (5 000 FCFA)',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                        );
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.settings_outlined, color: TechSosColors.primary, size: 22),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                'Paramètres de l\'application',
                                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                               ),
                             ),

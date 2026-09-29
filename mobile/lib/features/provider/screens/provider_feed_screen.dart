@@ -43,12 +43,13 @@ class _ProviderFeedScreenState extends ConsumerState<ProviderFeedScreen> {
     return Scaffold(
       backgroundColor: TechSosColors.background,
       appBar: AppBar(
-        title: const TechSosLogoHorizontal(
-          height: 38,
-          variant: TechSosLogoVariant.white,
-          showSubtitle: false,
+        title: const Row(
+          children: [
+            TechSosLogo(size: 28, variant: TechSosLogoVariant.white),
+            SizedBox(width: 10),
+            Text('Fil des pannes à Bamako'),
+          ],
         ),
-        titleSpacing: 0,
         elevation: 0,
       ),
       body: Center(

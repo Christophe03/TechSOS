@@ -6,6 +6,7 @@ import '../../../core/widgets/techsos_button.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/widgets/edit_profile_dialog.dart';
 import '../../auth/widgets/change_password_dialog.dart';
+import '../../settings/screens/settings_screen.dart';
 import 'client_home_screen.dart';
 import 'my_requests_screen.dart';
 import 'publish_repair_screen.dart';
@@ -136,14 +137,19 @@ class _ClientProfileTab extends ConsumerWidget {
     return Scaffold(
       backgroundColor: TechSosColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Mon Profil Client',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: TechSosColors.primary,
+        title: const Text('Mon Profil Client'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Paramètres',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
+            },
           ),
-        ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -293,17 +299,22 @@ class _ClientProfileTab extends ConsumerWidget {
                     ),
                     const Divider(height: 1),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                        );
+                      },
                       child: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                         child: Row(
                           children: [
-                            Icon(Icons.help_outline_rounded, color: TechSosColors.primary, size: 22),
+                            Icon(Icons.settings_outlined, color: TechSosColors.primary, size: 22),
                             SizedBox(width: 14),
                             Expanded(
                               child: Text(
-                                'Aide & Support Bamako',
-                                style: TextStyle(fontSize: 14),
+                                'Paramètres de l\'application',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                               ),
                             ),
                             Icon(Icons.chevron_right_rounded, color: Colors.grey),

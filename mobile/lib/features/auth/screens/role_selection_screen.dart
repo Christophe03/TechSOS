@@ -26,11 +26,21 @@ class RoleSelectionScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   // Logo officiel TechSOS — bouclier + éclair vectoriel
                   const Center(
-                    child: TechSosLogo(size: 96, withText: true),
+                    child: TechSosLogo(size: 80, withText: false),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 16),
 
-                  // Sous-titre
+                  // Titre et sous-titre
+                  const Text(
+                    'Bienvenue sur TechSOS',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: TechSosColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   const Text(
                     'La solution d\'urgence pour vos appareils en panne à Bamako',
                     textAlign: TextAlign.center,
