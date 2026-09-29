@@ -9,6 +9,7 @@ import 'features/auth/providers/auth_provider.dart';
 import 'features/auth/screens/role_selection_screen.dart';
 import 'features/client/screens/client_main_screen.dart';
 import 'features/provider/screens/provider_main_screen.dart';
+import 'features/settings/providers/settings_provider.dart';
 
 /// Root application widget for TechSOS
 class TechSosApp extends ConsumerWidget {
@@ -17,6 +18,13 @@ class TechSosApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+    final settings = ref.watch(settingsProvider);
+
+    final themeMode = switch (settings.theme) {
+      'dark' => ThemeMode.dark,
+      'auto' => ThemeMode.system,
+      _ => ThemeMode.light,
+    };
 
     Widget homeScreen;
     if (!authState.isAuthenticated) {
@@ -31,6 +39,8 @@ class TechSosApp extends ConsumerWidget {
       title: 'TechSOS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       home: homeScreen,
     );
   }

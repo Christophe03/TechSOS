@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/styles.dart';
 import '../../../core/widgets/techsos_button.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/widgets/change_password_dialog.dart';
@@ -24,6 +23,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _showNotice(String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -187,6 +187,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? TechSosColors.cardBackgroundDark : Colors.white;
+    final borderColor = isDark ? TechSosColors.borderDark : TechSosColors.border;
+    final textPrimary = isDark ? TechSosColors.textPrimaryDark : TechSosColors.textPrimary;
+    final textSecondary = isDark ? TechSosColors.textSecondaryDark : TechSosColors.textSecondary;
+
     final authState = ref.watch(authProvider);
     final user = authState.user;
     final isProvider = user?.role == 'PROVIDER';
@@ -194,7 +200,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final settingsNotifier = ref.read(settingsProvider.notifier);
 
     return Scaffold(
-      backgroundColor: TechSosColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Paramètres'),
         elevation: 0,
@@ -212,12 +218,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: TechSosColors.border),
+                    border: Border.all(color: borderColor),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
+                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -227,11 +233,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       CircleAvatar(
                         radius: 28,
-                        backgroundColor: TechSosColors.primary.withValues(alpha: 0.1),
+                        backgroundColor: TechSosColors.primary.withValues(alpha: isDark ? 0.25 : 0.1),
                         child: Icon(
                           isProvider ? Icons.storefront_rounded : Icons.person_rounded,
                           size: 32,
-                          color: TechSosColors.primary,
+                          color: isDark ? TechSosColors.accent : TechSosColors.primary,
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -243,10 +249,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               isProvider
                                   ? (user?.workshopName ?? user?.fullName ?? 'Atelier TechSOS')
                                   : (user?.fullName ?? 'Utilisateur TechSOS'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: TechSosColors.textPrimary,
+                                color: textPrimary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -254,21 +260,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             const SizedBox(height: 2),
                             Text(
                               user?.phone ?? '+223 ...',
-                              style: TechSosStyles.bodySecondary,
+                              style: TextStyle(fontSize: 14, color: textSecondary),
                             ),
                             const SizedBox(height: 4),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: TechSosColors.primary.withValues(alpha: 0.08),
+                                color: TechSosColors.primary.withValues(alpha: isDark ? 0.3 : 0.08),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 isProvider ? 'Compte Réparateur Pro' : 'Compte Client Bamako',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: TechSosColors.primary,
+                                  color: isDark ? Colors.white : TechSosColors.primary,
                                 ),
                               ),
                             ),
@@ -277,7 +283,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       IconButton(
                         tooltip: 'Modifier mes informations',
-                        icon: const Icon(Icons.edit_outlined, color: TechSosColors.primary),
+                        icon: Icon(Icons.edit_outlined, color: isDark ? TechSosColors.accent : TechSosColors.primary),
                         onPressed: () => EditProfileDialog.show(context, isProvider: isProvider),
                       ),
                     ],
@@ -285,12 +291,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
 
                 // ── 1. MON COMPTE ──
-                _buildSectionHeader('MON COMPTE'),
+                _buildSectionHeader('MON COMPTE', textSecondary),
                 _buildCard([
                   _buildNavTile(
                     icon: Icons.person_outline_rounded,
                     title: 'Mon profil',
                     subtitle: 'Consulter et modifier vos coordonnées',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () => EditProfileDialog.show(context, isProvider: isProvider),
                   ),
                   const Divider(height: 1),
@@ -298,6 +306,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     icon: Icons.edit_outlined,
                     title: 'Modifier mes informations',
                     subtitle: isProvider ? 'Nom de l\'atelier, quartier, bio' : 'Nom, email, adresse',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () => EditProfileDialog.show(context, isProvider: isProvider),
                   ),
                   const Divider(height: 1),
@@ -306,6 +316,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     iconColor: TechSosColors.accent,
                     title: 'Modifier le mot de passe',
                     subtitle: 'Sécuriser votre accès avec un mot de passe robuste',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () => ChangePasswordDialog.show(context),
                   ),
                   const Divider(height: 1),
@@ -313,17 +325,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     icon: Icons.phone_android_rounded,
                     title: 'Numéro de téléphone principal',
                     value: user?.phone ?? 'Non renseigné',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
                 // ── 2. NOTIFICATIONS ──
-                _buildSectionHeader('NOTIFICATIONS'),
+                _buildSectionHeader('NOTIFICATIONS', textSecondary),
                 _buildCard([
                   _buildSwitchTile(
                     icon: Icons.notifications_active_outlined,
                     title: 'Notifications push',
                     subtitle: 'Alertes en temps réel sur votre appareil',
                     value: settings.notifPush,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) => settingsNotifier.setNotifPush(v),
                   ),
                   const Divider(height: 1),
@@ -332,6 +348,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     title: 'Messages et devis',
                     subtitle: 'Nouvelles offres, réponses et statuts d\'atelier',
                     value: settings.notifMessages,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) => settingsNotifier.setNotifMessages(v),
                   ),
                   const Divider(height: 1),
@@ -340,6 +358,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     title: 'Rappels de dépannage',
                     subtitle: 'Appareils prêts au retrait, suivis en cours',
                     value: settings.notifRappels,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) => settingsNotifier.setNotifRappels(v),
                   ),
                   const Divider(height: 1),
@@ -348,6 +368,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     title: 'Actualités TechSOS',
                     subtitle: 'Nouveaux ateliers certifiés et guides techniques',
                     value: settings.notifActualites,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) => settingsNotifier.setNotifActualites(v),
                   ),
                   const Divider(height: 1),
@@ -356,61 +378,76 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     title: 'Offres & Promotions',
                     subtitle: 'Bons plans sur les pièces et forfaits ateliers',
                     value: settings.notifPromos,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) => settingsNotifier.setNotifPromos(v),
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
-                // ── 3. APPARENCE ──
-                _buildSectionHeader('APPARENCE'),
+                // ── 3. APPARENCE (CLAIRE, SOMBRE, AUTOMATIQUE) ──
+                _buildSectionHeader('APPARENCE', textSecondary),
                 _buildCard([
                   _buildThemeOptionTile(
                     icon: Icons.light_mode_rounded,
                     title: 'Thème clair',
-                    subtitle: 'Interface lumineuse et contrastée (actif)',
+                    subtitle: 'Interface lumineuse et contrastée',
                     isSelected: settings.theme == 'light',
-                    badgeText: 'Actif',
-                    badgeColor: TechSosColors.success,
-                    onTap: () => settingsNotifier.setTheme('light'),
+                    badgeText: settings.theme == 'light' ? 'Actif' : 'Clair',
+                    badgeColor: settings.theme == 'light' ? TechSosColors.success : (isDark ? TechSosColors.textSecondaryDark : TechSosColors.primary),
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
+                    onTap: () {
+                      settingsNotifier.setTheme('light');
+                      _showNotice('Thème clair activé');
+                    },
                   ),
                   const Divider(height: 1),
                   _buildThemeOptionTile(
                     icon: Icons.dark_mode_rounded,
                     title: 'Thème sombre',
-                    subtitle: 'Réduit la fatigue oculaire la nuit',
+                    subtitle: 'Bleu nuit profond, réduit la fatigue visuelle',
                     isSelected: settings.theme == 'dark',
-                    badgeText: 'Bientôt',
-                    badgeColor: TechSosColors.alert,
+                    badgeText: settings.theme == 'dark' ? 'Actif' : 'Sombre',
+                    badgeColor: settings.theme == 'dark' ? TechSosColors.success : TechSosColors.accent,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
-                      _showNotice('Le thème sombre complet arrive très prochainement dans la mise à jour !');
+                      settingsNotifier.setTheme('dark');
+                      _showNotice('Thème sombre activé');
                     },
                   ),
                   const Divider(height: 1),
                   _buildThemeOptionTile(
                     icon: Icons.brightness_auto_rounded,
                     title: 'Thème automatique',
-                    subtitle: 'S\'adapte aux paramètres de votre système Android / iOS',
+                    subtitle: 'S\'adapte aux réglages système de votre appareil',
                     isSelected: settings.theme == 'auto',
-                    badgeText: 'Bientôt',
-                    badgeColor: TechSosColors.alert,
+                    badgeText: settings.theme == 'auto' ? 'Actif' : 'Système',
+                    badgeColor: settings.theme == 'auto' ? TechSosColors.success : TechSosColors.accent,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
-                      _showNotice('Le basculement automatique sera disponible avec le mode sombre.');
+                      settingsNotifier.setTheme('auto');
+                      _showNotice('Thème automatique (système) activé');
                     },
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
                 // ── 4. LANGUE ET PRÉFÉRENCES ──
-                _buildSectionHeader('LANGUE ET PRÉFÉRENCES'),
+                _buildSectionHeader('LANGUE ET PRÉFÉRENCES', textSecondary),
                 _buildCard([
                   _buildNavTile(
                     icon: Icons.language_rounded,
                     title: 'Langue de l\'application',
                     subtitle: 'Français (Mali)',
-                    trailingWidget: const Row(
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
+                    trailingWidget: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Français', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: TechSosColors.primary)),
-                        SizedBox(width: 4),
-                        Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                        Text('Français', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isDark ? TechSosColors.accent : TechSosColors.primary)),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.chevron_right_rounded, color: Colors.grey),
                       ],
                     ),
                     onTap: () => _showNotice('TechSOS est actuellement optimisé en Français. Le Bambara arrive bientôt !'),
@@ -420,12 +457,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     icon: Icons.location_on_outlined,
                     title: 'Ville et Région par défaut',
                     subtitle: 'Bamako (Communes I à VI)',
-                    trailingWidget: const Row(
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
+                    trailingWidget: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Bamako', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: TechSosColors.primary)),
-                        SizedBox(width: 4),
-                        Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                        Text('Bamako', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isDark ? TechSosColors.accent : TechSosColors.primary)),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.chevron_right_rounded, color: Colors.grey),
                       ],
                     ),
                     onTap: () => _showNotice('Zone de couverture principale : District de Bamako, Mali.'),
@@ -436,6 +475,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     iconColor: TechSosColors.success,
                     title: 'Devise monétaire',
                     subtitle: 'Franc CFA (FCFA) - XOF',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     trailingWidget: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -446,16 +487,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     onTap: () => _showNotice('La devise officielle appliquée à toutes les transactions est le FCFA.'),
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
                 // ── 5. SÉCURITÉ ET CONFIDENTIALITÉ ──
-                _buildSectionHeader('SÉCURITÉ ET CONFIDENTIALITÉ'),
+                _buildSectionHeader('SÉCURITÉ ET CONFIDENTIALITÉ', textSecondary),
                 _buildCard([
                   _buildNavTile(
                     icon: Icons.lock_reset_rounded,
                     iconColor: TechSosColors.accent,
                     title: 'Changer le mot de passe',
                     subtitle: 'Mettre à jour vos clés d\'accès chiffrées (bcrypt)',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () => ChangePasswordDialog.show(context),
                   ),
                   const Divider(height: 1),
@@ -464,6 +507,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     title: 'Déverrouillage biométrique',
                     subtitle: 'Empreinte digitale ou reconnaissance faciale',
                     value: settings.biometricsEnabled,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) {
                       settingsNotifier.setBiometrics(v);
                       _showNotice(v ? 'Sécurité biométrique activée' : 'Sécurité biométrique désactivée');
@@ -474,6 +519,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     icon: Icons.security_rounded,
                     title: 'Sessions et sécurité',
                     subtitle: 'Authentification JWT sécurisée et stockage chiffré',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
                       _showInfoDialog(
                         'Sessions & Sécurité',
@@ -487,6 +534,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     icon: Icons.privacy_tip_outlined,
                     title: 'Données personnelles et RGPD / Mali',
                     subtitle: 'Gestion de vos informations et respect de la vie privée',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
                       _showInfoDialog(
                         'Données personnelles',
@@ -496,16 +545,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       );
                     },
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
                 // ── 6. DONNÉES ET STOCKAGE ──
-                _buildSectionHeader('DONNÉES ET STOCKAGE'),
+                _buildSectionHeader('DONNÉES ET STOCKAGE', textSecondary),
                 _buildCard([
                   _buildSwitchTile(
                     icon: Icons.data_saver_on_outlined,
                     title: 'Économiseur de données mobiles',
                     subtitle: 'Réduit la qualité d\'affichage préalable des photos',
                     value: settings.dataSaver,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) {
                       settingsNotifier.setDataSaver(v);
                       _showNotice(v ? 'Économiseur de données activé' : 'Économiseur de données désactivé');
@@ -517,6 +568,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     title: 'Synchronisation automatique hors-ligne',
                     subtitle: 'Télécharge les pannes et devis pour consultation hors-connexion',
                     value: settings.autoSync,
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onChanged: (v) => settingsNotifier.setAutoSync(v),
                   ),
                   const Divider(height: 1),
@@ -525,6 +578,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     iconColor: const Color(0xFFE53935),
                     title: 'Vider le cache applicatif',
                     subtitle: settings.isLoading ? 'Nettoyage en cours...' : 'Libérer l\'espace temporaire des images et requêtes',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     trailingWidget: settings.isLoading
                         ? const SizedBox(
                             width: 20,
@@ -534,15 +589,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         : const Icon(Icons.cleaning_services_outlined, color: Color(0xFFE53935), size: 20),
                     onTap: settings.isLoading ? null : _confirmClearCache,
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
                 // ── 7. AIDE ET SUPPORT ──
-                _buildSectionHeader('AIDE ET SUPPORT'),
+                _buildSectionHeader('AIDE ET SUPPORT', textSecondary),
                 _buildCard([
                   _buildNavTile(
                     icon: Icons.help_outline_rounded,
                     title: 'Foire Aux Questions (FAQ)',
                     subtitle: 'Comment publier un SOS, accepter un devis, payer',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
                       _showInfoDialog(
                         'Foire Aux Questions',
@@ -558,9 +615,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const Divider(height: 1),
                   _buildNavTile(
                     icon: Icons.support_agent_rounded,
-                    iconColor: TechSosColors.primary,
+                    iconColor: isDark ? TechSosColors.accent : TechSosColors.primary,
                     title: 'Contacter l\'assistance client',
                     subtitle: 'Équipe support disponible 7j/7 à Bamako',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
                       _showInfoDialog(
                         'Assistance TechSOS Bamako',
@@ -578,31 +637,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     iconColor: const Color(0xFF795548),
                     title: 'Signaler un problème technique',
                     subtitle: 'Rapporter un dysfonctionnement ou une suggestion',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
                       _showNotice('Merci de contacter le support technique pour transmettre votre rapport de bug.');
                     },
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
                 // ── 8. À PROPOS ──
-                _buildSectionHeader('À PROPOS'),
+                _buildSectionHeader('À PROPOS', textSecondary),
                 _buildCard([
                   _buildInfoTile(
                     icon: Icons.info_outline_rounded,
                     title: 'Version de l\'application',
                     value: 'TechSOS v1.0.0 (Build 2026)',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                   ),
                   const Divider(height: 1),
                   _buildInfoTile(
                     icon: Icons.domain_rounded,
                     title: 'Éditeur & Concepteur',
                     value: 'Golden Innovation Tech · Bamako',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                   ),
                   const Divider(height: 1),
                   _buildNavTile(
                     icon: Icons.article_outlined,
                     title: 'Conditions Générales d\'Utilisation (CGU)',
                     subtitle: 'Droits et devoirs des clients et réparateurs',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
                       _showInfoDialog(
                         'Conditions d\'Utilisation',
@@ -617,6 +684,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     icon: Icons.policy_outlined,
                     title: 'Politique de confidentialité',
                     subtitle: 'Protection des échanges et médias stockés',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
                     onTap: () {
                       _showInfoDialog(
                         'Politique de Confidentialité',
@@ -624,10 +693,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       );
                     },
                   ),
-                ]),
+                ], cardBg, borderColor, isDark),
 
                 // ── 9. GESTION DU COMPTE (ACTIONS SENSIBLES) ──
-                _buildSectionHeader('GESTION DU COMPTE'),
+                _buildSectionHeader('GESTION DU COMPTE', textSecondary),
                 const SizedBox(height: 4),
 
                 // Bouton Déconnexion
@@ -657,13 +726,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 24),
 
                 // Signature bas de page
-                const Center(
+                Center(
                   child: Text(
                     'TechSOS Bamako v1.0.0\nGolden Innovation Tech · République du Mali',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,
-                      color: TechSosColors.textSecondary,
+                      color: textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -678,36 +747,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  //  COMPOSANTS VISUELS HELPER CONFORMES AU DESIGN SYSTEM EXISTANT
+  //  COMPOSANTS VISUELS HELPER CONFORMES AU DESIGN SYSTEM (LIGHT & DARK)
   // ─────────────────────────────────────────────────────────────────────────
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, Color textColor) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8, top: 22),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.bold,
-          color: TechSosColors.textSecondary,
+          color: textColor,
           letterSpacing: 0.8,
         ),
       ),
     );
   }
 
-  Widget _buildCard(List<Widget> children) {
+  Widget _buildCard(List<Widget> children, Color cardBg, Color borderColor, bool isDark) {
     return Material(
-      color: Colors.white,
+      color: cardBg,
       borderRadius: BorderRadius.circular(16),
       clipBehavior: Clip.antiAlias,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: TechSosColors.border),
+          border: Border.all(color: borderColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.02),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -725,6 +794,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     Color iconColor = TechSosColors.primary,
     required String title,
     required String subtitle,
+    required Color textPrimary,
+    required Color textSecondary,
     Widget? trailingWidget,
     VoidCallback? onTap,
   }) {
@@ -742,12 +813,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: TechSosColors.textPrimary),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimary),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12, color: TechSosColors.textSecondary),
+                    style: TextStyle(fontSize: 12, color: textSecondary),
                   ),
                 ],
               ),
@@ -764,6 +835,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     Color iconColor = TechSosColors.primary,
     required String title,
     required String value,
+    required Color textPrimary,
+    required Color textSecondary,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
@@ -774,12 +847,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: TechSosColors.textPrimary),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimary),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: TechSosColors.textSecondary),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textSecondary),
           ),
         ],
       ),
@@ -792,16 +865,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     required String title,
     required String subtitle,
     required bool value,
+    required Color textPrimary,
+    required Color textSecondary,
     required ValueChanged<bool> onChanged,
   }) {
     return SwitchListTile(
       title: Text(
         title,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: TechSosColors.textPrimary),
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimary),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(fontSize: 12, color: TechSosColors.textSecondary),
+        style: TextStyle(fontSize: 12, color: textSecondary),
       ),
       value: value,
       onChanged: onChanged,
@@ -819,6 +894,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     required bool isSelected,
     required String badgeText,
     required Color badgeColor,
+    required Color textPrimary,
+    required Color textSecondary,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -827,7 +904,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
         child: Row(
           children: [
-            Icon(icon, color: isSelected ? TechSosColors.accent : TechSosColors.primary, size: 22),
+            Icon(icon, color: isSelected ? TechSosColors.accent : iconColor(isSelected, textPrimary), size: 22),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -838,13 +915,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? TechSosColors.accent : TechSosColors.textPrimary,
+                      color: isSelected ? TechSosColors.accent : textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 12, color: TechSosColors.textSecondary),
+                    style: TextStyle(fontSize: 12, color: textSecondary),
                   ),
                 ],
               ),
@@ -874,5 +951,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Color iconColor(bool isSelected, Color textPrimary) {
+    if (isSelected) return TechSosColors.accent;
+    return textPrimary;
   }
 }
