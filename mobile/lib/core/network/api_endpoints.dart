@@ -1,12 +1,23 @@
+import 'package:flutter/foundation.dart';
+
 /// Endpoints de l'API REST TechSOS
 class ApiEndpoints {
   ApiEndpoints._();
 
-  /// URL de base de l'API avec fallback vers l'émulateur Android (10.0.2.2) ou localhost
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:3000/api',
-  );
+  static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
+
+  /// URL de base de l'API avec détection automatique (10.0.2.2 pour Android, localhost pour Web/Windows)
+  static String get baseUrl {
+    if (_envBaseUrl.isNotEmpty) return _envBaseUrl;
+    if (kIsWeb) return 'http://localhost:3000/api';
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'http://10.0.2.2:3000/api';
+      default:
+        return 'http://localhost:3000/api';
+    }
+  }
+
 
   // Authentification
   static const String login = '/auth/login';
