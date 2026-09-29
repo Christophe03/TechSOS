@@ -222,15 +222,18 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget>
               size: 22,
             ),
             const SizedBox(width: 8),
-            const Text(
-              'Message vocal (Recommandé)',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: TechSosColors.primary,
+            const Expanded(
+              child: Text(
+                'Message vocal (Recommandé)',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: TechSosColors.primary,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
@@ -240,7 +243,7 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget>
               child: const Text(
                 'Hors-ligne OK',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: TechSosColors.primary,
                 ),
@@ -322,12 +325,15 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget>
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'Enregistrement vocal en cours...',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: TechSosColors.accent,
+            const Flexible(
+              child: Text(
+                'Enregistrement vocal en cours...',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: TechSosColors.accent,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -505,8 +511,11 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget>
           ),
         ),
         const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 4,
           children: [
             TextButton.icon(
               key: const ValueKey('audio_delete_button'),
@@ -638,12 +647,15 @@ class _AudioPlayerCardState extends State<AudioPlayerCard> {
                 size: 20,
               ),
               const SizedBox(width: 8),
-              Text(
-                widget.title ?? 'Message vocal du client',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: TechSosColors.primary,
+              Expanded(
+                child: Text(
+                  widget.title ?? 'Message vocal du client',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: TechSosColors.primary,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
