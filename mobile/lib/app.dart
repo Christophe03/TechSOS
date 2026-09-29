@@ -8,6 +8,7 @@ import 'core/widgets/techsos_button.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/auth/screens/role_selection_screen.dart';
 import 'features/client/screens/client_main_screen.dart';
+import 'features/provider/screens/provider_main_screen.dart';
 
 /// Root application widget for TechSOS
 class TechSosApp extends ConsumerWidget {
@@ -21,7 +22,7 @@ class TechSosApp extends ConsumerWidget {
     if (!authState.isAuthenticated) {
       homeScreen = const RoleSelectionScreen();
     } else if (authState.user?.isProvider == true) {
-      homeScreen = const TechSosHomeScreen();
+      homeScreen = const ProviderMainScreen();
     } else {
       homeScreen = const ClientMainScreen();
     }

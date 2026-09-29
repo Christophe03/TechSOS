@@ -31,6 +31,12 @@ class ApiEndpoints {
 
   // Gestion Atelier, Abonnements & Médias
   static const String workshop = '/workshop';
+  static const String workshopStats = '/workshop/stats';
+  static const String workshopQuickEntry = '/workshop/quick-entry';
+  static String workshopStatus(String id) => '/workshop/$id/status';
+  static const String myOffers = '/offers/my-offers';
   static const String subscriptions = '/subscriptions';
+  static const String currentSubscription = '/subscriptions/current';
+  static const String payMobileMoney = '/subscriptions/pay-mobile-money';
   static const String storageUpload = '/storage/upload';
 }
