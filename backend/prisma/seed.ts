@@ -119,13 +119,13 @@ export async function seed() {
   }
 
   // --- Seed des comptes de démonstration (Golden Innovation Tech) ---
-  const passwordHash = await bcrypt.hash('password123', 10);
-  const adminPasswordHash = await bcrypt.hash('adminpassword123', 10);
+  const passwordHash = await bcrypt.hash('TechSos2026!', 10);
+  const adminPasswordHash = await bcrypt.hash('TechSosAdmin2026!', 10);
 
   // 1. Client Démo
   const demoClient = await prisma.user.upsert({
     where: { phone: '+22370000001' },
-    update: {},
+    update: { passwordHash },
     create: {
       phone: '+22370000001',
       fullName: 'Amadou Diallo',
@@ -148,7 +148,7 @@ export async function seed() {
 
   const demoProviderUser = await prisma.user.upsert({
     where: { phone: '+22376000001' },
-    update: {},
+    update: { passwordHash },
     create: {
       phone: '+22376000001',
       fullName: 'Mamadou Koné',
@@ -158,6 +158,7 @@ export async function seed() {
       address: 'Hamdallaye ACI 2000, Bamako',
     },
   });
+
 
   await prisma.providerProfile.upsert({
     where: { userId: demoProviderUser.id },

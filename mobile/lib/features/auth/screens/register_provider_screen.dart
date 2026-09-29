@@ -111,9 +111,12 @@ class _RegisterProviderScreenState
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Form(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -379,8 +382,9 @@ class _RegisterProviderScreenState
                 const SizedBox(height: 24),
 
                 // Lien Se connecter
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     const Text(
                       'Déjà inscrit ?',
@@ -413,7 +417,9 @@ class _RegisterProviderScreenState
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   InputDecoration _buildInputDecoration({

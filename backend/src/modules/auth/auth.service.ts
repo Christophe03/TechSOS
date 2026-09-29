@@ -135,12 +135,35 @@ export class AuthService {
    * Connexion unifiée pour clients et réparateurs
    */
   async login(dto: LoginDto) {
+    const rawIdentifier = dto.identifier.trim();
+    const digitsOnly = rawIdentifier.replace(/\D/g, '');
+    
+    // Génère les variantes possibles pour le numéro (ex: +22370000001, 70000001, email)
+    const searchConditions: Array<{ phone?: string; email?: string }> = [
+      { phone: rawIdentifier },
+      { email: rawIdentifier.toLowerCase() },
+    ];
+
+    if (digitsOnly.length === 8) {
+      if (rawIdentifier !== `+223${digitsOnly}`) {
+        searchConditions.push({ phone: `+223${digitsOnly}` });
+      }
+      if (rawIdentifier !== digitsOnly) {
+        searchConditions.push({ phone: digitsOnly });
+      }
+    } else if (digitsOnly.startsWith('223') && digitsOnly.length === 11) {
+      const local = digitsOnly.substring(3);
+      if (rawIdentifier !== `+${digitsOnly}`) {
+        searchConditions.push({ phone: `+${digitsOnly}` });
+      }
+      if (rawIdentifier !== local) {
+        searchConditions.push({ phone: local });
+      }
+    }
+
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { phone: dto.identifier },
-          { email: dto.identifier },
-        ],
+        OR: searchConditions,
       },
       include: {
         providerProfile: true,
@@ -148,6 +171,7 @@ export class AuthService {
     });
 
     if (!user) {
+
       throw new UnauthorizedException('Identifiants invalides');
     }
 

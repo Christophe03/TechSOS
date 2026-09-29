@@ -91,13 +91,17 @@ class _RegisterClientScreenState extends ConsumerState<RegisterClientScreen> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+
                 const Text(
                   'Inscription Client',
                   style: TextStyle(
@@ -310,8 +314,9 @@ class _RegisterClientScreenState extends ConsumerState<RegisterClientScreen> {
                 const SizedBox(height: 24),
 
                 // Lien Se connecter
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     const Text(
                       'Déjà inscrit ?',
@@ -344,7 +349,9 @@ class _RegisterClientScreenState extends ConsumerState<RegisterClientScreen> {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   InputDecoration _buildInputDecoration({

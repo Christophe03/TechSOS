@@ -281,6 +281,7 @@ describe('AuthService', () => {
           OR: [
             { phone: '+22370123456' },
             { email: '+22370123456' },
+            { phone: '70123456' },
           ],
         },
         include: {
