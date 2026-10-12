@@ -268,6 +268,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
+            {!isProvider && (
+              <div className="pt-2 border-t border-slate-100 space-y-2">
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Quartier de référence par défaut (Bamako)
+                </label>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-brand-accent absolute left-3 top-3 pointer-events-none" />
+                  <select
+                    value={addressZone}
+                    onChange={(e) => setAddressZone(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary"
+                  >
+                    <option value="">Sélectionner un quartier</option>
+                    <option value="Hamdallaye ACI 2000">Hamdallaye ACI 2000</option>
+                    <option value="Badalabougou">Badalabougou</option>
+                    <option value="Lafiabougou">Lafiabougou</option>
+                    <option value="Médina Coura">Médina Coura</option>
+                    <option value="Baco Djicoroni">Baco Djicoroni</option>
+                    <option value="Faladié">Faladié</option>
+                    <option value="Korofina">Korofina</option>
+                    <option value="Sogoniko">Sogoniko</option>
+                  </select>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  TechSOS vous proposera automatiquement les ateliers les plus proches de ce quartier.
+                </p>
+              </div>
+            )}
+
             <div className="pt-4 flex justify-end gap-3">
               <Button type="button" variant="outline" size="sm" onClick={onClose}>
                 Fermer

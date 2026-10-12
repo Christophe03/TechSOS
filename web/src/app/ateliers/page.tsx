@@ -21,7 +21,12 @@ import {
   Filter,
   Sparkles,
   Info,
+  Navigation,
+  Compass,
+  LocateFixed,
 } from "lucide-react";
+import { useAuth } from "@/lib/context/AuthContext";
+import { getDistanceToWorkshop, calculateDistanceKm } from "@/lib/utils/geo";
 import { WorkshopDetailModal } from "@/components/workshop/WorkshopDetailModal";
 
 // Curated verified workshop directory for Bamako
@@ -163,19 +168,26 @@ const SPECIALTY_OPTIONS = [
 ];
 
 export default function AteliersPage() {
+  const { user, userDistrict, setUserDistrict, userCoords, isLocating, locationError, requestGeoLocation } = useAuth();
   const [providers, setProviders] = useState<ProviderItem[]>(DEFAULT_BAMAKO_WORKSHOPS);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("ALL");
+  const [selectedDistrict, setSelectedDistrict] = useState(userDistrict || "Hamdallaye ACI 2000");
   const [selectedSpecialty, setSelectedSpecialty] = useState("Toutes");
   const [selectedWorkshop, setSelectedWorkshop] = useState<ProviderItem | null>(null);
+  const [onlyNearby, setOnlyNearby] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (userDistrict && userDistrict !== "ALL") {
+      setSelectedDistrict(userDistrict);
+    }
+  }, [userDistrict]);
 
   useEffect(() => {
     usersApi
       .getProviders()
       .then((data) => {
         if (data && data.length > 0) {
-          // Merge API providers with directory defaults to ensure maximum richness
           const combined = [...data];
           DEFAULT_BAMAKO_WORKSHOPS.forEach((def) => {
             if (!combined.some((c) => c.workshopName.toLowerCase() === def.workshopName.toLowerCase())) {
@@ -208,9 +220,13 @@ export default function AteliersPage() {
       p.user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (p.addressZone && p.addressZone.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchDistrict =
-      selectedDistrict === "ALL" ||
-      (p.addressZone && p.addressZone.toLowerCase().includes(selectedDistrict.toLowerCase()));
+    // Proximity filter: if onlyNearby is enabled, filter strictly by selectedDistrict (user's location)
+    let matchDistrict = true;
+    if (onlyNearby && selectedDistrict !== "ALL") {
+      matchDistrict = !!(p.addressZone && p.addressZone.toLowerCase().includes(selectedDistrict.toLowerCase()));
+    } else if (selectedDistrict !== "ALL") {
+      matchDistrict = !!(p.addressZone && p.addressZone.toLowerCase().includes(selectedDistrict.toLowerCase()));
+    }
 
     const specs = parseSpecialties(p.specialtiesJson);
     const matchSpecialty =
@@ -247,6 +263,68 @@ export default function AteliersPage() {
         </p>
       </div>
 
+      {/* User Proximity Bar */}
+      <div className="bg-gradient-to-r from-brand-primary/5 via-orange-50 to-amber-50 p-4 sm:p-5 rounded-2xl border border-brand-primary/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-brand-primary text-white flex items-center justify-center shrink-0 shadow-sm">
+            <LocateFixed className="w-5 h-5 text-brand-accent animate-pulse" />
+          </div>
+          <div>
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <span>Votre localisation détectée</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            </div>
+            <div className="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2 mt-0.5">
+              <span>Quartier : <span className="text-brand-primary">{selectedDistrict === "ALL" ? "Tout Bamako" : selectedDistrict}</span></span>
+              {onlyNearby && selectedDistrict !== "ALL" && (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200">
+                  À proximité immédiate
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={requestGeoLocation}
+            isLoading={isLocating}
+            leftIcon={<Navigation className="w-3.5 h-3.5 text-brand-accent" />}
+            className="text-xs bg-white hover:bg-slate-50"
+          >
+            Actualiser ma position GPS
+          </Button>
+
+          <button
+            onClick={() => {
+              if (onlyNearby) {
+                setOnlyNearby(false);
+                setSelectedDistrict("ALL");
+              } else {
+                setOnlyNearby(true);
+                setSelectedDistrict(userDistrict || "Hamdallaye ACI 2000");
+              }
+            }}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
+              onlyNearby && selectedDistrict !== "ALL"
+                ? "bg-brand-accent text-white border-brand-accent shadow-sm"
+                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>{onlyNearby && selectedDistrict !== "ALL" ? "Afficher tous les quartiers" : "Voir uniquement à proximité"}</span>
+          </button>
+        </div>
+      </div>
+
+      {locationError && (
+        <div className="text-xs p-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-2">
+          <span>⚠️ {locationError}</span>
+        </div>
+      )}
+
       {/* Filter and Search Bar */}
       <Card className="p-6 border-slate-200 shadow-hover space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
@@ -271,13 +349,19 @@ export default function AteliersPage() {
             </div>
             <select
               value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSelectedDistrict(val);
+                if (val !== "ALL") {
+                  setUserDistrict(val);
+                }
+              }}
               className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary"
             >
               <option value="ALL">Tous les quartiers (District de Bamako)</option>
               {POPULAR_DISTRICTS.map((dist) => (
                 <option key={dist} value={dist}>
-                  {dist}
+                  {dist} {dist === userDistrict ? "📍 (Mon quartier)" : ""}
                 </option>
               ))}
             </select>
@@ -393,10 +477,33 @@ export default function AteliersPage() {
                       </span>
                     </div>
 
-                    {/* Zone / Address */}
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-700 flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-brand-accent shrink-0 mt-0.5" />
-                      <span>{workshop.addressZone || "Bamako"}</span>
+                    {/* Zone / Address & Distance Badge */}
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-700 flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-4 h-4 text-brand-accent shrink-0 mt-0.5" />
+                        <span>{workshop.addressZone || "Bamako"}</span>
+                      </div>
+                      {(() => {
+                        const distKm = getDistanceToWorkshop(userCoords, workshop.addressZone);
+                        const isSameDistrict =
+                          selectedDistrict !== "ALL" &&
+                          workshop.addressZone?.toLowerCase().includes(selectedDistrict.toLowerCase());
+
+                        if (distKm !== null) {
+                          return (
+                            <span className="shrink-0 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+                              ~{distKm} km
+                            </span>
+                          );
+                        } else if (isSameDistrict) {
+                          return (
+                            <span className="shrink-0 px-2 py-0.5 rounded-full bg-orange-100 text-brand-accent text-[10px] font-bold border border-orange-200">
+                              Votre quartier
+                            </span>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
 
                     {/* Specialties chips */}

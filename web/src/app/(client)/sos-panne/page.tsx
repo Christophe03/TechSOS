@@ -20,20 +20,28 @@ import {
   Printer,
   Tv,
   ArrowRight,
+  Navigation,
+  LocateFixed,
 } from "lucide-react";
 
 export default function SosPannePage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, userDistrict, setUserDistrict, requestGeoLocation, isLocating } = useAuth();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [equipmentTitle, setEquipmentTitle] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
-  const [district, setDistrict] = useState(POPULAR_DISTRICTS[0]);
+  const [district, setDistrict] = useState(userDistrict || POPULAR_DISTRICTS[0]);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (userDistrict) {
+      setDistrict(userDistrict);
+    }
+  }, [userDistrict]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -231,21 +239,35 @@ export default function SosPannePage() {
 
           {/* 5. Quartier */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-              5. Votre quartier à Bamako
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                5. Votre quartier à Bamako
+              </label>
+              <button
+                type="button"
+                onClick={requestGeoLocation}
+                disabled={isLocating}
+                className="text-xs font-semibold text-brand-primary hover:text-brand-accent flex items-center gap-1 transition-colors"
+              >
+                <Navigation className={`w-3.5 h-3.5 ${isLocating ? "animate-spin" : ""}`} />
+                <span>{isLocating ? "Localisation..." : "Détecter ma position"}</span>
+              </button>
+            </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <MapPin className="w-4 h-4 text-brand-accent" />
               </div>
               <select
                 value={district}
-                onChange={(e) => setDistrict(e.target.value)}
+                onChange={(e) => {
+                  setDistrict(e.target.value);
+                  setUserDistrict(e.target.value);
+                }}
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary text-slate-900"
               >
                 {POPULAR_DISTRICTS.map((dist) => (
                   <option key={dist} value={dist}>
-                    {dist}
+                    {dist} {dist === userDistrict ? "📍 (Mon quartier)" : ""}
                   </option>
                 ))}
               </select>
