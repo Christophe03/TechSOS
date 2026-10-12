@@ -22,6 +22,9 @@ import {
   Phone,
   Smartphone,
   Loader2,
+  Download,
+  Banknote,
+  Calendar,
 } from "lucide-react";
 
 export default function WorkshopJournalPage() {
@@ -71,6 +74,55 @@ export default function WorkshopJournalPage() {
     }
   };
 
+  const handleExportCsv = () => {
+    if (entries.length === 0) {
+      alert("Le journal est vide. Aucun enregistrement à exporter.");
+      return;
+    }
+
+    const headers = [
+      "Ticket",
+      "Client",
+      "Telephone",
+      "Appareil",
+      "Panne",
+      "Devis FCFA",
+      "Statut",
+      "Date",
+    ];
+
+    const rows = entries.map((e) => [
+      `"${e.id.slice(0, 8)}"`,
+      `"${e.clientName.replace(/"/g, '""')}"`,
+      `"${e.clientPhone}"`,
+      `"${e.deviceBrandModel.replace(/"/g, '""')}"`,
+      `"${e.issueReported.replace(/"/g, '""')}"`,
+      e.estimatedPriceXof,
+      `"${e.status}"`,
+      `"${new Date(e.createdAt).toLocaleDateString("fr-FR")}"`,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8,\uFEFF" +
+      [headers.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `techsos-journal-comptoir-${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const totalDevis = entries.reduce((acc, curr) => acc + curr.estimatedPriceXof, 0);
+  const deliveredDevis = entries
+    .filter((e) => e.status === "LIVRE")
+    .reduce((acc, curr) => acc + curr.estimatedPriceXof, 0);
+
   const filteredEntries = entries.filter((e) => {
     const matchSearch =
       e.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -93,13 +145,62 @@ export default function WorkshopJournalPage() {
           </p>
         </div>
 
-        <Button
-          variant="accent"
-          leftIcon={<Plus className="w-4 h-4" />}
-          onClick={() => setQuickEntryOpen(true)}
-        >
-          Prise en charge rapide (Quick Entry)
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Download className="w-4 h-4 text-emerald-600" />}
+            onClick={handleExportCsv}
+          >
+            Exporter CSV
+          </Button>
+
+          <Button
+            variant="accent"
+            size="sm"
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setQuickEntryOpen(true)}
+          >
+            Prise en charge rapide
+          </Button>
+        </div>
+      </div>
+
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="p-4 bg-slate-50/80 border-slate-200 flex items-center justify-between">
+          <div>
+            <div className="text-xs font-bold text-slate-500 uppercase">Total Appareils</div>
+            <div className="text-xl font-black text-slate-900 mt-0.5">{entries.length} fiches</div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center font-bold">
+            📱
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-emerald-50/60 border-emerald-200 flex items-center justify-between">
+          <div>
+            <div className="text-xs font-bold text-emerald-800 uppercase">Recettes Encaissées (Livrés)</div>
+            <div className="text-xl font-black text-emerald-700 mt-0.5">
+              {deliveredDevis.toLocaleString("fr-FR")} FCFA
+            </div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+            <Banknote className="w-5 h-5" />
+          </div>
+        </Card>
+
+        <Card className="p-4 bg-amber-50/60 border-amber-200 flex items-center justify-between">
+          <div>
+            <div className="text-xs font-bold text-amber-800 uppercase">Devis en cours de travaux</div>
+            <div className="text-xl font-black text-amber-700 mt-0.5">
+              {(totalDevis - deliveredDevis).toLocaleString("fr-FR")} FCFA
+            </div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+            <Clock className="w-5 h-5" />
+          </div>
+        </Card>
       </div>
 
       <WorkshopNav />

@@ -15,13 +15,16 @@ import {
   LogOut,
   PhoneCall,
   ShieldCheck,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
+import { SettingsModal } from "../settings/SettingsModal";
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth();
 
   const isAtelierRoute = pathname?.startsWith("/atelier");
 
@@ -105,6 +108,13 @@ export const Navbar: React.FC = () => {
                   SOS Panne
                 </Button>
               </Link>
+              <button
+                onClick={() => setSettingsOpen(true)}
+                title="Paramètres du compte"
+                className="p-2 text-slate-500 hover:text-brand-primary rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
               <button
                 onClick={logout}
                 title="Déconnexion"
@@ -197,6 +207,17 @@ export const Navbar: React.FC = () => {
                     <Button variant="outline" className="w-full">Mes Demandes</Button>
                   </Link>
                 )}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setSettingsOpen(true);
+                  }}
+                  className="w-full"
+                  leftIcon={<Settings className="w-4 h-4 text-brand-primary" />}
+                >
+                  Paramètres du compte
+                </Button>
                 <Button variant="ghost" onClick={() => { logout(); setMobileMenuOpen(false); }} className="w-full text-rose-600">
                   Se déconnecter
                 </Button>
@@ -215,6 +236,15 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
         </div>
+      )}
+
+      {user && (
+        <SettingsModal
+          isOpen={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          user={user}
+          onUserUpdated={(u) => setUser(u)}
+        />
       )}
     </header>
   );

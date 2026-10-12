@@ -21,6 +21,8 @@ import {
   Filter,
   CheckCircle2,
   Loader2,
+  Search,
+  Sparkles,
 } from "lucide-react";
 
 export default function FilUrgencesPage() {
@@ -29,6 +31,8 @@ export default function FilUrgencesPage() {
 
   const [feed, setFeed] = useState<Repair[]>([]);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("ALL");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [withAudioOnly, setWithAudioOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedRepairForOffer, setSelectedRepairForOffer] = useState<Repair | null>(null);
 
@@ -55,8 +59,14 @@ export default function FilUrgencesPage() {
   }, [user, authLoading, router]);
 
   const filteredFeed = feed.filter((r) => {
-    if (selectedDistrict === "ALL") return true;
-    return r.district === selectedDistrict;
+    const matchDistrict = selectedDistrict === "ALL" || r.district === selectedDistrict;
+    const matchSearch =
+      searchTerm.trim() === "" ||
+      r.equipmentTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.issueDescription.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchAudio = !withAudioOnly || !!r.audioVoiceUrl;
+
+    return matchDistrict && matchSearch && matchAudio;
   });
 
   return (
@@ -75,34 +85,62 @@ export default function FilUrgencesPage() {
 
       <WorkshopNav />
 
-      {/* District filter */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1 mr-2">
-          <Filter className="w-3.5 h-3.5" /> Filtrer par quartier :
-        </span>
-        <button
-          onClick={() => setSelectedDistrict("ALL")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-            selectedDistrict === "ALL"
-              ? "bg-brand-primary text-white"
-              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-          }`}
-        >
-          Tous ({feed.length})
-        </button>
-        {POPULAR_DISTRICTS.map((dist) => (
+      {/* Filter and Search Box */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div className="relative w-full sm:w-96">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Rechercher par appareil ou panne (ex: iPhone, écran, PC)..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary shadow-sm"
+            />
+          </div>
+
           <button
-            key={dist}
-            onClick={() => setSelectedDistrict(dist)}
+            onClick={() => setWithAudioOnly(!withAudioOnly)}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all border ${
+              withAudioOnly
+                ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            <Volume2 className="w-4 h-4" />
+            <span>Note vocale incluse uniquement</span>
+          </button>
+        </div>
+
+        {/* District filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1 mr-2">
+            <Filter className="w-3.5 h-3.5" /> Filtrer par quartier :
+          </span>
+          <button
+            onClick={() => setSelectedDistrict("ALL")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              selectedDistrict === dist
+              selectedDistrict === "ALL"
                 ? "bg-brand-primary text-white"
                 : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
             }`}
           >
-            {dist}
+            Tous ({feed.length})
           </button>
-        ))}
+          {POPULAR_DISTRICTS.map((dist) => (
+            <button
+              key={dist}
+              onClick={() => setSelectedDistrict(dist)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                selectedDistrict === dist
+                  ? "bg-brand-primary text-white"
+                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              {dist}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Feed list */}

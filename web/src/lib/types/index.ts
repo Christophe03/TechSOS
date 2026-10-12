@@ -4,8 +4,12 @@ export interface User {
   id: string;
   phone: string;
   fullName: string;
+  email?: string | null;
+  city?: string | null;
+  address?: string | null;
   role: Role;
   workshopName?: string | null;
+  addressZone?: string | null;
   specialties?: string | null;
   ratingAvg?: number;
   reviewCount?: number;

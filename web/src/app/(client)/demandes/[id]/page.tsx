@@ -20,9 +20,12 @@ import {
   Star,
   Check,
   Phone,
+  MessageSquare,
   ShieldCheck,
   AlertCircle,
   Loader2,
+  ArrowUpDown,
+  Zap,
 } from "lucide-react";
 
 export default function DemandeDetailPage() {
@@ -35,6 +38,7 @@ export default function DemandeDetailPage() {
   const [acceptingOfferId, setAcceptingOfferId] = useState<string | null>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sortCriteria, setSortCriteria] = useState<"cheapest" | "fastest" | "best_rated">("cheapest");
 
   const fetchRepair = () => {
     if (!repairId) return;
@@ -234,7 +238,52 @@ export default function DemandeDetailPage() {
                 </Card>
               ) : (
                 <div className="space-y-4">
-                  {offers.map((offer) => {
+                  {/* Sorting filters */}
+                  <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-bold w-fit">
+                    <button
+                      onClick={() => setSortCriteria("cheapest")}
+                      className={`px-3 py-1.5 rounded-lg transition-all ${
+                        sortCriteria === "cheapest"
+                          ? "bg-white text-emerald-700 shadow-sm"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      💰 Le moins cher
+                    </button>
+                    <button
+                      onClick={() => setSortCriteria("fastest")}
+                      className={`px-3 py-1.5 rounded-lg transition-all ${
+                        sortCriteria === "fastest"
+                          ? "bg-white text-brand-primary shadow-sm"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      ⚡ Le plus rapide
+                    </button>
+                    <button
+                      onClick={() => setSortCriteria("best_rated")}
+                      className={`px-3 py-1.5 rounded-lg transition-all ${
+                        sortCriteria === "best_rated"
+                          ? "bg-white text-amber-700 shadow-sm"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      ⭐ Mieux noté
+                    </button>
+                  </div>
+
+                  {offers
+                    .slice()
+                    .sort((a, b) => {
+                      if (sortCriteria === "cheapest") return a.priceXof - b.priceXof;
+                      if (sortCriteria === "best_rated") {
+                        const rA = a.provider?.ratingAvg || 5.0;
+                        const rB = b.provider?.ratingAvg || 5.0;
+                        return rB - rA;
+                      }
+                      return 0;
+                    })
+                    .map((offer) => {
                     const provider = offer.provider;
                     return (
                       <Card
@@ -333,8 +382,33 @@ export default function DemandeDetailPage() {
                 </div>
               </div>
 
+              {/* Action buttons to call or WhatsApp workshop */}
+              {selectedOffer.provider?.phone && (
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <a
+                    href={`https://wa.me/${selectedOffer.provider.phone.replace(/[\s\-\+\(\)]/g, "")}?text=${encodeURIComponent(
+                      `Bonjour ${selectedOffer.provider.workshopName || ""}, je vous contacte concernant la réparation de mon appareil (${repair.equipmentTitle}) sur TechSOS.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>WhatsApp Atelier</span>
+                  </a>
+
+                  <a
+                    href={`tel:${selectedOffer.provider.phone}`}
+                    className="py-2.5 px-3 rounded-xl bg-brand-primary hover:bg-brand-primary-dark text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>Appeler Direct</span>
+                  </a>
+                </div>
+              )}
+
               <div className="text-xs text-slate-600 bg-white/70 p-3 rounded-lg border border-emerald-100">
-                💡 Vous pouvez contacter le technicien par appel ou vous rendre à son atelier. Une fois l'appareil testé et récupéré, le statut passera à "Terminée".
+                💡 Vous pouvez contacter le technicien directement par appel ou WhatsApp. Une fois l'appareil testé et récupéré, le statut passera à "Terminée".
               </div>
             </Card>
           )}

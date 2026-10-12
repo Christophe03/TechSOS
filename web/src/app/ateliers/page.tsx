@@ -20,7 +20,9 @@ import {
   ArrowRight,
   Filter,
   Sparkles,
+  Info,
 } from "lucide-react";
+import { WorkshopDetailModal } from "@/components/workshop/WorkshopDetailModal";
 
 // Curated verified workshop directory for Bamako
 const DEFAULT_BAMAKO_WORKSHOPS: ProviderItem[] = [
@@ -165,6 +167,7 @@ export default function AteliersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("ALL");
   const [selectedSpecialty, setSelectedSpecialty] = useState("Toutes");
+  const [selectedWorkshop, setSelectedWorkshop] = useState<ProviderItem | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -415,7 +418,17 @@ export default function AteliersPage() {
                   </div>
 
                   {/* Actions footer */}
-                  <div className="pt-5 border-t border-slate-100 space-y-3">
+                  <div className="pt-5 border-t border-slate-100 space-y-2.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs"
+                      leftIcon={<Info className="w-3.5 h-3.5 text-brand-primary" />}
+                      onClick={() => setSelectedWorkshop(workshop)}
+                    >
+                      Consulter la fiche complète
+                    </Button>
+
                     <div className="grid grid-cols-2 gap-2">
                       <a
                         href={`https://wa.me/${cleanPhone}?text=${waMessage}`}
@@ -478,6 +491,16 @@ export default function AteliersPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Modal: Full Workshop Info */}
+      {selectedWorkshop && (
+        <WorkshopDetailModal
+          workshop={selectedWorkshop}
+          isOpen={true}
+          onClose={() => setSelectedWorkshop(null)}
+          specialties={parseSpecialties(selectedWorkshop.specialtiesJson)}
+        />
+      )}
     </div>
   );
 }
