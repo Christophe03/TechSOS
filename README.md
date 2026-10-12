@@ -57,12 +57,19 @@ TechSOS repose sur une architecture découplée, typée et hautement testable :
                  └───────────────────────────┘    └────────────────────┘
 ```
 
-### Frontend Mobile
+### Frontend Web (Next.js 15)
+- **Framework** : Next.js 15 (App Router, React 19, TypeScript)
+- **Design System & Styling** : Tailwind CSS v3, tokens officiels TechSOS, Lucide React
+- **Audio & Médias** : Native Web Audio API & MediaRecorder pour la captation de notes vocales dans le navigateur
+- **Modules** : Vitrine SEO haute réassurance, Espace Client SOS Panne & Comparateur, Dashboard Pro Atelier, Journal de comptoir physique (*Quick Entry*) et relances WhatsApp directes (`wa.me`)
+- **Port** : `3001` (`npm run dev`)
+
+### Frontend Mobile (Flutter)
 - **Framework** : Flutter 3.x (Dart 3.x)
 - **Gestion d'État** : Riverpod (StateNotifier / Notifier)
 - **Client HTTP** : Dio avec intercepteurs JWT, gestion des timeouts et reconnexion automatique
 - **Audio & Médias** : Paquet `record` pour la captation de notes vocales (format AAC/M4A), `audioplayers` pour la restitution
-- **Interface Utilisateur** : Design System Material 3, palette de couleurs TechSOS (Bleu Nuit `#1E3A8A`, Orange d'Urgence `#F97316`, Vert Succès `#10B981`)
+- **Interface Utilisateur** : Design System Material 3, palette de couleurs TechSOS (Bleu Nuit `#1F3A5F`, Orange Technique `#E8641C`, Vert Succès `#2E8B57`)
 - **Stockage Local** : `shared_preferences` pour le cache des catégories et sessions
 
 ### Backend API
