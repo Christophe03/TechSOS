@@ -1,9 +1,13 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { useAuth } from "@/lib/context/AuthContext";
 import { Logo } from "../ui/Logo";
 import { Phone, Mail, MapPin, Shield, Clock, Heart } from "lucide-react";
 
 export const Footer: React.FC = () => {
+  const { user } = useAuth();
   return (
     <footer className="bg-brand-primary-dark text-slate-300 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
@@ -61,34 +65,51 @@ export const Footer: React.FC = () => {
           {/* Col 3: Pour les Ateliers & Réparateurs */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-              Espace Professionnels
+              {user && user.role === "PROVIDER" ? "Mon Espace Pro" : "Professionnels & Ateliers"}
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li>
-                <Link href="/atelier/dashboard" className="hover:text-white transition-colors">
-                  Dashboard Atelier Pro
-                </Link>
-              </li>
-              <li>
-                <Link href="/atelier/fil-urgences" className="hover:text-white transition-colors">
-                  Fil des pannes en direct
-                </Link>
-              </li>
-              <li>
-                <Link href="/atelier/journal" className="hover:text-white transition-colors">
-                  Journal de comptoir & WhatsApp
-                </Link>
-              </li>
-              <li>
-                <Link href="/atelier/abonnement" className="hover:text-white transition-colors">
-                  Abonnement Pro (5 000 FCFA)
-                </Link>
-              </li>
-              <li>
-                <Link href="/inscription" className="hover:text-white transition-colors">
-                  Référencer mon atelier
-                </Link>
-              </li>
+              {user && user.role === "PROVIDER" ? (
+                <>
+                  <li>
+                    <Link href="/atelier/dashboard" className="hover:text-white transition-colors">
+                      Dashboard Atelier Pro
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/atelier/fil-urgences" className="hover:text-white transition-colors">
+                      Fil des pannes en direct
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/atelier/journal" className="hover:text-white transition-colors">
+                      Journal de comptoir & WhatsApp
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/atelier/abonnement" className="hover:text-white transition-colors">
+                      Abonnement Pro (5 000 FCFA)
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link href="/ateliers" className="hover:text-white transition-colors">
+                      Annuaire des Ateliers Agréés
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/connexion" className="hover:text-white transition-colors">
+                      Connexion Réparateur
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/inscription" className="hover:text-white transition-colors">
+                      Devenir Atelier Partenaire
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 

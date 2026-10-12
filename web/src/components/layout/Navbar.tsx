@@ -115,15 +115,6 @@ export const Navbar: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center gap-2.5">
-              <Link href="/atelier/dashboard">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  leftIcon={<Wrench className="w-3.5 h-3.5 text-brand-primary" />}
-                >
-                  Espace Atelier
-                </Button>
-              </Link>
               <Link href="/connexion">
                 <Button variant="ghost" size="sm">
                   Connexion
@@ -214,11 +205,6 @@ export const Navbar: React.FC = () => {
               <>
                 <Link href="/connexion" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="outline" className="w-full">Connexion / Inscription</Button>
-                </Link>
-                <Link href="/atelier/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full" leftIcon={<Wrench className="w-4 h-4" />}>
-                    Espace Réparateur & Atelier
-                  </Button>
                 </Link>
               </>
             )}

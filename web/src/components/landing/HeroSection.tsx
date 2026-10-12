@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { useAuth } from "@/lib/context/AuthContext";
 import { Button } from "../ui/Button";
 import {
   AlertTriangle,
@@ -13,6 +16,7 @@ import {
 } from "lucide-react";
 
 export const HeroSection: React.FC = () => {
+  const { user } = useAuth();
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-brand-primary via-brand-primary-dark to-slate-900 text-white pt-12 pb-20 lg:pt-20 lg:pb-28">
       {/* Background technical grid pattern */}
@@ -53,16 +57,29 @@ export const HeroSection: React.FC = () => {
                   Déclarer un SOS Panne Express
                 </Button>
               </Link>
-              <Link href="/connexion" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto bg-white/5 border-white/20 text-white hover:bg-white/10 hover:border-white/40"
-                  leftIcon={<Wrench className="w-4 h-4 text-brand-accent" />}
-                >
-                  Espace Atelier & Réparateurs
-                </Button>
-              </Link>
+              {user && user.role === "PROVIDER" ? (
+                <Link href="/atelier/dashboard" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto bg-white/5 border-white/20 text-white hover:bg-white/10 hover:border-white/40"
+                    leftIcon={<Wrench className="w-4 h-4 text-brand-accent" />}
+                  >
+                    Mon Dashboard Atelier
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/ateliers" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto bg-white/5 border-white/20 text-white hover:bg-white/10 hover:border-white/40"
+                    leftIcon={<MapPin className="w-4 h-4 text-brand-accent" />}
+                  >
+                    Trouver un Atelier Agréé
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Trust points */}
