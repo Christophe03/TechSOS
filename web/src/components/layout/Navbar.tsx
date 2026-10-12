@@ -62,16 +62,18 @@ export const Navbar: React.FC = () => {
             Accueil
           </Link>
           <Link
+            href="/ateliers"
+            className={`text-sm font-semibold transition-colors hover:text-brand-accent ${
+              pathname === "/ateliers" ? "text-brand-accent" : "text-slate-700"
+            }`}
+          >
+            Trouver un Atelier
+          </Link>
+          <Link
             href="/#comment-ca-marche"
             className="text-sm font-semibold text-slate-700 hover:text-brand-accent transition-colors"
           >
             Comment ça marche
-          </Link>
-          <Link
-            href="/#quartiers"
-            className="text-sm font-semibold text-slate-700 hover:text-brand-accent transition-colors"
-          >
-            Ateliers à Bamako
           </Link>
           <Link
             href="/#tarifs"
@@ -168,18 +170,18 @@ export const Navbar: React.FC = () => {
             Accueil
           </Link>
           <Link
+            href="/ateliers"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-2 text-base font-semibold text-slate-800 hover:text-brand-accent"
+          >
+            Trouver un Atelier
+          </Link>
+          <Link
             href="/#comment-ca-marche"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-base font-semibold text-slate-800 hover:text-brand-accent"
           >
             Comment ça marche
-          </Link>
-          <Link
-            href="/#quartiers"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-slate-800 hover:text-brand-accent"
-          >
-            Ateliers vérifiés à Bamako
           </Link>
           <Link
             href="/#tarifs"
