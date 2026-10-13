@@ -26,7 +26,7 @@ import {
   LocateFixed,
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
-import { getDistanceToWorkshop, calculateDistanceKm } from "@/lib/utils/geo";
+import { getDistanceToWorkshop, calculateDistanceKm, getWorkshopDistanceScore } from "@/lib/utils/geo";
 import { WorkshopDetailModal } from "@/components/workshop/WorkshopDetailModal";
 
 // Curated verified workshop directory for Bamako
@@ -234,6 +234,15 @@ export default function AteliersPage() {
       specs.some((s) => s.toLowerCase().includes(selectedSpecialty.toLowerCase()));
 
     return matchSearch && matchDistrict && matchSpecialty;
+  }).sort((a, b) => {
+    // Sort from closest to farthest
+    const distA = getWorkshopDistanceScore(userCoords, selectedDistrict, a.addressZone);
+    const distB = getWorkshopDistanceScore(userCoords, selectedDistrict, b.addressZone);
+    if (distA !== distB) {
+      return distA - distB;
+    }
+    // Secondary sort: highest rating
+    return (b.ratingAvg || 0) - (a.ratingAvg || 0);
   });
 
   const getCleanPhone = (phone: string) => {
@@ -409,8 +418,13 @@ export default function AteliersPage() {
 
       {/* Directory Grid */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
-          <span>{filteredWorkshops.length} atelier{filteredWorkshops.length > 1 ? "s" : ""} référencé{filteredWorkshops.length > 1 ? "s" : ""} à Bamako</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 font-semibold px-1">
+          <div className="flex items-center gap-2">
+            <span>{filteredWorkshops.length} atelier{filteredWorkshops.length > 1 ? "s" : ""} trouvé{filteredWorkshops.length > 1 ? "s" : ""}</span>
+            <span className="px-2 py-0.5 rounded-full bg-orange-100 text-brand-accent text-[11px] font-bold border border-orange-200">
+              ⚡ Classés du plus proche au plus loin
+            </span>
+          </div>
           <span className="flex items-center gap-1 text-emerald-700">
             <Clock className="w-3.5 h-3.5" /> Réponse moyenne en atelier : 15 min
           </span>
@@ -498,11 +512,17 @@ export default function AteliersPage() {
                         } else if (isSameDistrict) {
                           return (
                             <span className="shrink-0 px-2 py-0.5 rounded-full bg-orange-100 text-brand-accent text-[10px] font-bold border border-orange-200">
-                              Votre quartier
+                              &lt; 1 km (Votre quartier)
+                            </span>
+                          );
+                        } else {
+                          const score = getWorkshopDistanceScore(userCoords, selectedDistrict, workshop.addressZone);
+                          return (
+                            <span className="shrink-0 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200">
+                              ~{score} km
                             </span>
                           );
                         }
-                        return null;
                       })()}
                     </div>
 

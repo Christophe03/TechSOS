@@ -125,3 +125,41 @@ export function getDistanceToWorkshop(
   // Fallback default city distance estimation
   return null;
 }
+
+/**
+ * Computes an effective distance in km between the user and a workshop.
+ * Uses exact GPS if userCoords is available, or computes distance from userDistrict center to workshop zone.
+ * Returns a numerical distance in km (default fallback 15km if unknown).
+ */
+export function getWorkshopDistanceScore(
+  userCoords: GeoLocationCoords | null,
+  userDistrict: string | null | undefined,
+  workshopZone?: string | null
+): number {
+  if (!workshopZone) return 99;
+
+  // 1. If GPS is present, calculate direct distance
+  if (userCoords) {
+    const directDist = getDistanceToWorkshop(userCoords, workshopZone);
+    if (directDist !== null) return directDist;
+  }
+
+  // 2. If user has a default district
+  if (userDistrict && userDistrict !== "ALL") {
+    // If workshop is directly in user's district, distance is minimal (~0.5 km)
+    if (workshopZone.toLowerCase().includes(userDistrict.toLowerCase())) {
+      return 0.5;
+    }
+
+    const userGeo = BAMAKO_DISTRICT_COORDS[userDistrict];
+    if (userGeo) {
+      for (const [wDistName, wGeo] of Object.entries(BAMAKO_DISTRICT_COORDS)) {
+        if (workshopZone.toLowerCase().includes(wDistName.toLowerCase())) {
+          return calculateDistanceKm(userGeo.lat, userGeo.lng, wGeo.lat, wGeo.lng);
+        }
+      }
+    }
+  }
+
+  return 20;
+}
