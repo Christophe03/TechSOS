@@ -171,17 +171,11 @@ export default function AteliersPage() {
   const { user, userDistrict, setUserDistrict, userCoords, isLocating, locationError, requestGeoLocation } = useAuth();
   const [providers, setProviders] = useState<ProviderItem[]>(DEFAULT_BAMAKO_WORKSHOPS);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState(userDistrict || "Hamdallaye ACI 2000");
+  const [selectedDistrict, setSelectedDistrict] = useState("ALL");
   const [selectedSpecialty, setSelectedSpecialty] = useState("Toutes");
   const [selectedWorkshop, setSelectedWorkshop] = useState<ProviderItem | null>(null);
-  const [onlyNearby, setOnlyNearby] = useState(true);
+  const [onlyNearby, setOnlyNearby] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (userDistrict && userDistrict !== "ALL") {
-      setSelectedDistrict(userDistrict);
-    }
-  }, [userDistrict]);
 
   useEffect(() => {
     usersApi
@@ -220,13 +214,11 @@ export default function AteliersPage() {
       p.user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (p.addressZone && p.addressZone.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    // Proximity filter: if onlyNearby is enabled, filter strictly by selectedDistrict (user's location)
-    let matchDistrict = true;
-    if (onlyNearby && selectedDistrict !== "ALL") {
-      matchDistrict = !!(p.addressZone && p.addressZone.toLowerCase().includes(selectedDistrict.toLowerCase()));
-    } else if (selectedDistrict !== "ALL") {
-      matchDistrict = !!(p.addressZone && p.addressZone.toLowerCase().includes(selectedDistrict.toLowerCase()));
-    }
+    // Strict district filter only if user explicitly selected a district other than ALL
+    const matchDistrict =
+      selectedDistrict === "ALL" ||
+      !onlyNearby ||
+      (p.addressZone && p.addressZone.toLowerCase().includes(selectedDistrict.toLowerCase()));
 
     const specs = parseSpecialties(p.specialtiesJson);
     const matchSpecialty =
@@ -235,9 +227,10 @@ export default function AteliersPage() {
 
     return matchSearch && matchDistrict && matchSpecialty;
   }).sort((a, b) => {
-    // Sort from closest to farthest
-    const distA = getWorkshopDistanceScore(userCoords, selectedDistrict, a.addressZone);
-    const distB = getWorkshopDistanceScore(userCoords, selectedDistrict, b.addressZone);
+    // Systematic sort from closest to farthest relative to user's location (GPS or userDistrict)
+    const referenceDistrict = userDistrict || (selectedDistrict !== "ALL" ? selectedDistrict : "Hamdallaye ACI 2000");
+    const distA = getWorkshopDistanceScore(userCoords, referenceDistrict, a.addressZone);
+    const distB = getWorkshopDistanceScore(userCoords, referenceDistrict, b.addressZone);
     if (distA !== distB) {
       return distA - distB;
     }
@@ -280,16 +273,14 @@ export default function AteliersPage() {
           </div>
           <div>
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-              <span>Votre localisation détectée</span>
+              <span>Votre position de référence</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             </div>
             <div className="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2 mt-0.5">
-              <span>Quartier : <span className="text-brand-primary">{selectedDistrict === "ALL" ? "Tout Bamako" : selectedDistrict}</span></span>
-              {onlyNearby && selectedDistrict !== "ALL" && (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200">
-                  À proximité immédiate
-                </span>
-              )}
+              <span>Quartier : <span className="text-brand-primary">{userDistrict || "Hamdallaye ACI 2000"}</span></span>
+              <span className="px-2.5 py-0.5 rounded-full bg-orange-100 text-brand-accent text-[11px] font-bold border border-orange-200">
+                ⚡ Trié du plus proche au plus loin
+              </span>
             </div>
           </div>
         </div>
@@ -317,13 +308,13 @@ export default function AteliersPage() {
               }
             }}
             className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
-              onlyNearby && selectedDistrict !== "ALL"
+              onlyNearby
                 ? "bg-brand-accent text-white border-brand-accent shadow-sm"
                 : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
-            <span>{onlyNearby && selectedDistrict !== "ALL" ? "Afficher tous les quartiers" : "Voir uniquement à proximité"}</span>
+            <span>{onlyNearby ? "Voir tous les ateliers (ordonnés)" : "Filtrer uniquement mon quartier"}</span>
           </button>
         </div>
       </div>

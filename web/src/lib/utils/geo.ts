@@ -144,22 +144,23 @@ export function getWorkshopDistanceScore(
     if (directDist !== null) return directDist;
   }
 
-  // 2. If user has a default district
-  if (userDistrict && userDistrict !== "ALL") {
-    // If workshop is directly in user's district, distance is minimal (~0.5 km)
-    if (workshopZone.toLowerCase().includes(userDistrict.toLowerCase())) {
-      return 0.5;
-    }
+  // 2. If user has a default district or fallback
+  const effectiveUserDistrict =
+    userDistrict && userDistrict !== "ALL" ? userDistrict : "Hamdallaye ACI 2000";
 
-    const userGeo = BAMAKO_DISTRICT_COORDS[userDistrict];
-    if (userGeo) {
-      for (const [wDistName, wGeo] of Object.entries(BAMAKO_DISTRICT_COORDS)) {
-        if (workshopZone.toLowerCase().includes(wDistName.toLowerCase())) {
-          return calculateDistanceKm(userGeo.lat, userGeo.lng, wGeo.lat, wGeo.lng);
-        }
+  // If workshop is directly in user's district, distance is minimal (~0.5 km)
+  if (workshopZone.toLowerCase().includes(effectiveUserDistrict.toLowerCase())) {
+    return 0.5;
+  }
+
+  const userGeo = BAMAKO_DISTRICT_COORDS[effectiveUserDistrict] || BAMAKO_DISTRICT_COORDS["Hamdallaye ACI 2000"];
+  if (userGeo) {
+    for (const [wDistName, wGeo] of Object.entries(BAMAKO_DISTRICT_COORDS)) {
+      if (workshopZone.toLowerCase().includes(wDistName.toLowerCase())) {
+        return calculateDistanceKm(userGeo.lat, userGeo.lng, wGeo.lat, wGeo.lng);
       }
     }
   }
 
-  return 20;
+  return 12.5;
 }
